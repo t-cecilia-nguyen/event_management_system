@@ -1,10 +1,13 @@
 package ca.gbc.roomservice.controller;
 
 import ca.gbc.roomservice.dto.RoomRequest;
+import ca.gbc.roomservice.dto.RoomResponse;
 import ca.gbc.roomservice.model.Room;
 import ca.gbc.roomservice.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,9 +21,17 @@ public class RoomController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public String createRoom(@RequestBody RoomRequest roomRequest) {
-        roomService.createRoom(roomRequest);
-        return "Room created successfully";
+    public ResponseEntity<RoomResponse> createRoom(@RequestBody RoomRequest roomRequest) {
+        RoomResponse createdRoom = roomService.createRoom(roomRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/rooms/" + createdRoom.id());
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(createdRoom);
     }
 
     @GetMapping
