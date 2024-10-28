@@ -1,0 +1,61 @@
+# ------------------------------------------------------------------------------------------
+# 1. docker-compose -p microservices-event-booking -f docker-compose.yml up -d
+#     -- This command will start the containers in detached mode without rebuilding the images (if they already exist)
+#
+# 2. docker-compose -p microservices-event-booking -f docker-compose.yml up -d --build
+#     -- This command forces the rebuild of images, even if the images already exist, before starting the containers
+#-------------------------------------------------------------------------------------------
+version: '3.9'
+
+services:
+
+  room-service:
+    image: room-service
+    container_name: room-service
+    ports:
+      - "8084:8084"
+    build:
+      context: ./room-service
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - postgres
+    networks:
+      - spring
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-event-booking
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./data/postgres/rooms:/var/lib/postgresql/data
+      - ./local-docker-file/postgres/init/room/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - spring
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-event-booking
+    ports:
+      - "8888:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
+      - PGADMIN_DEFAULT_PASSWORD=password
+    networks:
+      - spring
+    restart: unless-stopped
+
+# Optional volumes section for persisting data
+volumes:
+  mongo-db:
+    driver: local
+
+networks:
+  spring:
+    driver: bridge

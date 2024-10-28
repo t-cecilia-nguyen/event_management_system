@@ -36,7 +36,7 @@ public class RoomController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Room> getAllRooms() {
+    public List<RoomResponse> getAllRooms() {
         return roomService.getAllRooms();
     }
 
@@ -46,9 +46,15 @@ public class RoomController {
         return roomService.getRoomById(id);
     }
 
-    @PutMapping("/{id}/availability")
-    public Room updateRoomAvailability(@PathVariable Long id, @RequestParam boolean availability) {
-        return roomService.updateRoomAvailability(id, availability);
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateRoom(@PathVariable("id") Long id,
+                                        @RequestBody RoomRequest roomRequest) {
+        String updatedRoomId = roomService.updateRoom(id, roomRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/rooms" + updatedRoomId);
+
+        return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")

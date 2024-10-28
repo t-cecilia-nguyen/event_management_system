@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -42,8 +43,20 @@ public class RoomServiceImpl implements RoomService {
                 room.isAvailability());
     }
     @Override
-    public List<Room> getAllRooms() {
-        return roomRepository.findAll();
+    public List<RoomResponse> getAllRooms() {
+        List<Room> rooms = roomRepository.findAll();
+        
+        return rooms.stream().map(this::mapToRoomResponse).toList();
+    }
+    
+    private RoomResponse mapToRoomResponse(Room room) {
+        return new RoomResponse(
+                room.getId(),
+                room.getRoomName(),
+                room.getCapacity(),
+                room.getFeatures(),
+                room.isAvailability()
+        );
     }
 
     @Override
@@ -52,19 +65,26 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public Room updateRoomAvailability(Long id, boolean availability) {
-        Room room = roomRepository.findById(id).orElse(null);
-        if (room == null) {
-            throw new NoSuchElementException("Room not found");
-        }
-        room.setAvailability(availability);
-        return roomRepository.save(room);
+    public String updateRoom(Long id, RoomRequest roomRequest) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Room not found with id" + id));
+
+        // Update
+        room.setRoomName(roomRequest.roomName());
+        room.setCapacity(roomRequest.capacity());
+        room.setFeatures(roomRequest.features());
+        room.setAvailability(roomRequest.availability());
+
+        // Save
+        Room updatedRoom = roomRepository.save(room);
+        return updatedRoom.getId().toString();
     }
 
     @Override
     public void deleteRoom(Long id) {
         log.debug("Deleting room with id {}", id);
         roomRepository.deleteById(id);
+        log.debug("Room with id {} deleted", id);
     }
 
     @Override

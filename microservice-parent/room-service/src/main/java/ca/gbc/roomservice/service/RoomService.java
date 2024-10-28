@@ -8,9 +8,10 @@ import java.util.List;
 
 public interface RoomService {
     RoomResponse createRoom (RoomRequest roomRequest);
-    List<Room> getAllRooms();
+    List<RoomResponse> getAllRooms();
     Room getRoomById(Long id);
-    Room updateRoomAvailability(Long id, boolean availability);
+    String updateRoom(Long id, RoomRequest roomRequest);
     void deleteRoom(Long id);
     List<Room> checkRoomAvailability(boolean availability);
+
 }

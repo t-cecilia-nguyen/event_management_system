@@ -13,11 +13,7 @@ java {
     }
 }
 
-tasks.register("prepareKotlinBuildScriptModel") {
-    doLast {
-        println("Preparing Kotlin build script model...")
-    }
-}
+//tasks.register("prepareKotlinBuildScriptModel") {}
 
 configurations {
     compileOnly {
