@@ -35,7 +35,8 @@ public class EventController {
     }
 
 
-    @GetMapping
+    @GetMapping("/")
+    @ResponseStatus(HttpStatus.OK)
     public List<EventResponse> getAllEvents() { return eventService.getAllEvents(); }
 
     @PutMapping("/{eventId}")

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" filepath="$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.main.iml" />
+    </modules>
+  </component>
+</project>

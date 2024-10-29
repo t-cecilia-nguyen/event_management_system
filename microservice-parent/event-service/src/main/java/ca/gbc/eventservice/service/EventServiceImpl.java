@@ -28,7 +28,7 @@ public class EventServiceImpl implements EventService{
 
     private Booking getBookingById(String id) {
         String url = "http://booking-service/api/booking/" + id;
-        System.out.println("Calling URL: " + url);
+        System.out.println("Calling Booking URL: " + url);
 
         Booking booking = restTemplate.getForObject(url, Booking.class);
 
