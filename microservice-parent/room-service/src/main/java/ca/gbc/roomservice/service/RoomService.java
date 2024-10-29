@@ -12,6 +12,6 @@ public interface RoomService {
     Room getRoomById(Long id);
     String updateRoom(Long id, RoomRequest roomRequest);
     void deleteRoom(Long id);
-    List<Room> checkRoomAvailability(boolean availability);
-
+    List<Room> checkAllAvailability(boolean availability);
+    boolean checkRoomAvailability(Long id);
 }

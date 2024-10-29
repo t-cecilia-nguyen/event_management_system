@@ -7,11 +7,16 @@ import ca.gbc.roomservice.repository.RoomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Service
@@ -20,6 +25,8 @@ import java.util.Optional;
 public class RoomServiceImpl implements RoomService {
 
     private final RoomRepository roomRepository;
+    private static final Logger logger = LoggerFactory.getLogger(RoomServiceImpl.class);
+
 
     @Override
     public RoomResponse createRoom (RoomRequest roomRequest) {
@@ -61,13 +68,14 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     public Room getRoomById(Long id) {
-        return roomRepository.findById(id).orElse(null);
+        return roomRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
     public String updateRoom(Long id, RoomRequest roomRequest) {
         Room room = roomRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Room not found with id" + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // Update
         room.setRoomName(roomRequest.roomName());
@@ -84,11 +92,17 @@ public class RoomServiceImpl implements RoomService {
     public void deleteRoom(Long id) {
         log.debug("Deleting room with id {}", id);
         roomRepository.deleteById(id);
-        log.debug("Room with id {} deleted", id);
     }
 
     @Override
-    public List<Room> checkRoomAvailability(boolean availability) {
+    public List<Room> checkAllAvailability(boolean availability) {
         return roomRepository.findByAvailability(availability);
+    }
+
+    @Override
+    public boolean checkRoomAvailability(Long id) {
+        Room room = roomRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return room.isAvailability();
     }
 }

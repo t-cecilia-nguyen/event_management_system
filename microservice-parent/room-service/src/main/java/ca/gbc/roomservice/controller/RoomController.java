@@ -5,6 +5,7 @@ import ca.gbc.roomservice.dto.RoomResponse;
 import ca.gbc.roomservice.model.Room;
 import ca.gbc.roomservice.service.RoomService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -12,12 +13,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.spec.PSource;
+
 
 @RestController
 @RequestMapping("/rooms")
 @RequiredArgsConstructor
 public class RoomController {
     private final RoomService roomService;
+    private static final Logger logger = LoggerFactory.getLogger(RoomController.class);
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -64,8 +71,14 @@ public class RoomController {
     }
 
     @GetMapping("/availability")
-    public List<Room> checkRoomAvailability(@RequestParam boolean availability) {
-        return roomService.checkRoomAvailability(availability);
+    @ResponseStatus(HttpStatus.OK)
+    public List<Room> checkAllAvailability(@RequestParam boolean availability) {
+        return roomService.checkAllAvailability(availability);
     }
 
+    @GetMapping("/{id}/availability")
+    @ResponseStatus(HttpStatus.OK)
+    public boolean checkRoomAvailability(@PathVariable Long id) {
+        return roomService.checkRoomAvailability(id);
+    }
 }

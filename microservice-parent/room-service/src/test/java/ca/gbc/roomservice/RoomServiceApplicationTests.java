@@ -7,8 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.util.ArrayList;
@@ -275,7 +273,55 @@ class RoomServiceApplicationTests {
     }
 
     @Test
-    void checkRoomAvailabilityTest() {
+    void checkAllAvailabilityTest() {
+        String[][] rooms = {
+                {"Lecture Hall A", "200", "Projector, Whiteboard, Sound System", "true"},
+                {"Conference Room B", "50", "Projector, Whiteboard", "true"},
+                {"Classroom C", "50", "Projector", "false"}
+        };
 
+        for (String[] room : rooms) {
+            String requestBody = String.format("""
+                    {
+                        "roomName": "%s",
+                        "capacity": "%s",
+                        "features": "%s",
+                        "availability": "%s"
+                    }
+                    """, room[0], room[1], room[2], room[3]);
+
+            RestAssured.given()
+                    .contentType("application/json")
+                    .body(requestBody)
+                    .when()
+                    .post("/rooms")
+                    .then()
+                    .log().all()
+                    .statusCode(201);
+        }
+
+        RestAssured.given()
+                .contentType("application/json")
+                .param("availability", "true")
+                .when()
+                .get("/rooms/availability")
+                .then()
+                .log().all()
+                .statusCode(200);
+    }
+
+    @Test
+    void checkRoomAvailabilityTest() {
+        // Using seed data
+
+        // Verify
+        RestAssured.given()
+                .contentType("application/json")
+                .when()
+                .get("/rooms/2/availability")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body(Matchers.equalTo("false"));
     }
 }
