@@ -38,7 +38,7 @@ class RoomServiceApplicationTests {
                     "capacity": "200",
                     "features": "Projector, Whiteboard, Sound System",
                     "availability": "true"
-                }                              
+                }
                 """;
 
         RestAssured.given()
@@ -182,7 +182,7 @@ class RoomServiceApplicationTests {
                     "capacity": "200",
                     "features": "Projector, Whiteboard, Sound System",
                     "availability": "true"
-                }                              
+                }
                 """;
 
         // Retrieve room ID
