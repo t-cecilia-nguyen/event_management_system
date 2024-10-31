@@ -34,7 +34,7 @@ class RoomServiceApplicationTests {
     void createRoomTest() {
         String requestBody = """
                 {
-                    "roomName": "Lecture Hall A",
+                    "roomName": "Lecture Hall D",
                     "capacity": "200",
                     "features": "Projector, Whiteboard, Sound System",
                     "availability": "true"
@@ -49,7 +49,7 @@ class RoomServiceApplicationTests {
                 .then()
                 .log().all()
                 .statusCode(201)
-                .body("roomName", Matchers.equalTo("Lecture Hall E"))
+                .body("roomName", Matchers.equalTo("Lecture Hall D"))
                 .body("capacity", Matchers.equalTo(200))
                 .body("features", Matchers.equalTo("Projector, Whiteboard, Sound System"))
                 .body("availability", Matchers.equalTo(true));
@@ -57,10 +57,29 @@ class RoomServiceApplicationTests {
 
     @Test
     void getAllRoomsTest() {
+        // Verify seed data
+        String[][] seedRooms = {
+                {"Lecture Hall A", "150", "Projector, Whiteboard, Sound System", "true"},
+                {"Conference Room B", "50", "Video Conferencing, Whiteboard, Coffee Machine", "false"},
+                {"Workshop Room C", "30", "Interactive Display, Whiteboard, Sound System", "true"}
+        };
+
+        for (int i = 0; i < seedRooms.length; i++) {
+            RestAssured.given()
+                    .contentType("application/json")
+                    .when()
+                    .get("/rooms")
+                    .then()
+                    .body("[" + i + "].roomName", Matchers.equalTo(seedRooms[i][0]))
+                    .body("[" + i + "].capacity", Matchers.equalTo(Integer.parseInt(seedRooms[i][1])))
+                    .body("[" + i + "].features", Matchers.equalTo(seedRooms[i][2]))
+                    .body("[" + i + "].availability", Matchers.equalTo(Boolean.parseBoolean(seedRooms[i][3])));
+        }
+
         // Array of all rooms
         String[][] rooms = {
-                {"Lecture Hall A", "200","Projector, Whiteboard, Sound System", "true"},
-                {"Conference Room B", "50", "Projector, Whiteboard", "true"}
+                {"Lecture Hall D", "200","Projector, Whiteboard, Sound System", "true"},
+                {"Conference Room E", "50", "Projector, Whiteboard", "false"}
         };
 
         // Loop through array and create each room
@@ -88,7 +107,7 @@ class RoomServiceApplicationTests {
                     .body("availability", Matchers.equalTo(Boolean.parseBoolean(room[3])));
         }
 
-        // Verify
+        // Verify that the list contains all seed and test rooms
         RestAssured.given()
                 .contentType("application/json")
                 .when()
@@ -96,7 +115,19 @@ class RoomServiceApplicationTests {
                 .then()
                 .log().all()
                 .statusCode(200)
-                .body("size()", Matchers.equalTo(rooms.length));
+                .body("size()", Matchers.equalTo(seedRooms.length + rooms.length));
+
+        for (int i = 0; i < seedRooms.length; i++) {
+            RestAssured.given()
+                    .contentType("application/json")
+                    .when()
+                    .get("/rooms")
+                    .then()
+                    .body("[" + i + "].roomName", Matchers.equalTo(seedRooms[i][0]))
+                    .body("[" + i + "].capacity", Matchers.equalTo(Integer.parseInt(seedRooms[i][1])))
+                    .body("[" + i + "].features", Matchers.equalTo(seedRooms[i][2]))
+                    .body("[" + i + "].availability", Matchers.equalTo(Boolean.parseBoolean(seedRooms[i][3])));
+        }
 
         for (int i = 0; i < rooms.length; i++) {
             RestAssured.given()
@@ -104,10 +135,10 @@ class RoomServiceApplicationTests {
                     .when()
                     .get("/rooms")
                     .then()
-                    .body("[" + i + "].roomName", Matchers.equalTo(rooms[i][0]))
-                    .body("[" + i + "].capacity", Matchers.equalTo(Integer.parseInt(rooms[i][1])))
-                    .body("[" + i + "].features", Matchers.equalTo(rooms[i][2]))
-                    .body("[" + i + "].availability", Matchers.equalTo(Boolean.parseBoolean(rooms[i][3])));
+                    .body("[" + (i + seedRooms.length) + "].roomName", Matchers.equalTo(rooms[i][0]))
+                    .body("[" + (i + seedRooms.length) + "].capacity", Matchers.equalTo(Integer.parseInt(rooms[i][1])))
+                    .body("[" + (i + seedRooms.length) + "].features", Matchers.equalTo(rooms[i][2]))
+                    .body("[" + (i + seedRooms.length) + "].availability", Matchers.equalTo(Boolean.parseBoolean(rooms[i][3])));
         }
     }
 
@@ -148,7 +179,8 @@ class RoomServiceApplicationTests {
         }
 
         // Specify room ID to verify
-        int roomIDToVerify = roomIds.get(2); // Third room
+        int roomIDToVerify = roomIds.get(2); // Third test room create, ID: 6
+        System.out.println("Room ID to verify: " + roomIDToVerify);
 
         String verifyBody = """
                 {
@@ -269,7 +301,7 @@ class RoomServiceApplicationTests {
                 .get("/rooms/" + roomId)
                 .then()
                 .log().all()
-                .statusCode(200);
+                .statusCode(404);
     }
 
     @Test
@@ -312,7 +344,7 @@ class RoomServiceApplicationTests {
 
     @Test
     void checkRoomAvailabilityTest() {
-        // Using seed data
+        // Room ID 2 = seed data
 
         // Verify
         RestAssured.given()
@@ -323,5 +355,35 @@ class RoomServiceApplicationTests {
                 .log().all()
                 .statusCode(200)
                 .body(Matchers.equalTo("false"));
+
+        // With new test room
+        String requestBody = """
+            {
+                "roomName": "Study Room G",
+                "capacity": "100",
+                "features": "Projector, Whiteboard",
+                "availability": "true"
+            }
+            """;
+
+        // Create new room
+        RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/rooms")
+                .then()
+                .log().all()
+                .statusCode(201);
+
+        // Verify
+        RestAssured.given()
+                .contentType("application/json")
+                .when()
+                .get("/rooms/4/availability") // new room is ID 4 because seed data has 3 rooms
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body(Matchers.equalTo("true"));
     }
 }
