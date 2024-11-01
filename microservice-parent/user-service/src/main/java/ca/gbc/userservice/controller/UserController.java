@@ -1,7 +1,6 @@
 package ca.gbc.userservice.controller;
 
 import ca.gbc.userservice.dto.UserRequest;
-import ca.gbc.userservice.model.Role;
 import ca.gbc.userservice.model.User;
 import ca.gbc.userservice.dto.UserResponse;
 import ca.gbc.userservice.service.UserService;
@@ -63,13 +62,13 @@ public class UserController {
 
     @GetMapping("/role")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> checkAllRole(@RequestParam Role role) {
+    public List<User> checkAllRole(@RequestParam String role) {
         return userService.checkAllRole(role);
     }
 
     @GetMapping("{id}/role")
     @ResponseStatus(HttpStatus.OK)
-    public Role checkUserRole(@PathVariable Long id) {
+    public String checkUserRole(@PathVariable Long id) {
         return userService.checkUserRole(id);
     }
 }

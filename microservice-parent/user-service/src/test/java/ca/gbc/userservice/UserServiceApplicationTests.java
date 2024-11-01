@@ -30,29 +30,29 @@ class UserServiceApplicationTests {
         postgreSQLContainer.start();
     }
 
-//    @Test
-//    void createUserTest() {
-//        String requestBody = """
-//                {
-//                    "name" : "Trang Nguyen",
-//                    "email" : "trang.nguyen3@georgebrown.ca",
-//                    "role" : "STUDENT",
-//                    "userType" : "STUDENT"
-//                }
-//                """;
-//
-//        RestAssured.given()
-//                .contentType("application/json")
-//                .body(requestBody)
-//                .when()
-//                .post("/users")
-//                .then()
-//                .log().all()
-//                .statusCode(201)
-//                .body("name", Matchers.equalTo("Trang Nguyen"))
-//                .body("email", Matchers.equalTo("trang.nguyen3@georgebrown.ca"))
-//                .body("role", Matchers.equalTo("STUDENT"))
-//                .body("userType", Matchers.equalTo("STUDENT"));
-//    }
+    @Test
+    void createUserTest() {
+        String requestBody = """
+                {
+                    "name" : "Trang Nguyen",
+                    "email" : "trang.nguyen3@georgebrown.ca",
+                    "role" : "STUDENT",
+                    "userType" : "STUDENT"
+                }
+                """;
+
+        RestAssured.given()
+                .contentType("application/json")
+                .body(requestBody)
+                .when()
+                .post("/users")
+                .then()
+                .log().all()
+                .statusCode(201)
+                .body("name", Matchers.equalTo("Trang Nguyen"))
+                .body("email", Matchers.equalTo("trang.nguyen3@georgebrown.ca"))
+                .body("role", Matchers.equalTo("STUDENT"))
+                .body("userType", Matchers.equalTo("STUDENT"));
+    }
 
 }

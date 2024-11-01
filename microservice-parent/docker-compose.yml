@@ -19,7 +19,7 @@ services:
       dockerfile: ./Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:postgresql://user-postgres:5433/user-service
+      #SPRING_DATASOURCE_URL: jdbc:postgresql://user-postgres:5433/user-service
     depends_on:
       - user-postgres
     networks:

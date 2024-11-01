@@ -3,7 +3,6 @@ package ca.gbc.userservice.service;
 
 import ca.gbc.userservice.dto.UserRequest;
 import ca.gbc.userservice.dto.UserResponse;
-import ca.gbc.userservice.model.Role;
 import ca.gbc.userservice.model.User;
 import ca.gbc.userservice.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -87,12 +86,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> checkAllRole(Role role) {
+    public List<User> checkAllRole(String role) {
         return userRepository.findByRole(role);
     }
 
     @Override
-    public Role checkUserRole(Long id) {
+    public String checkUserRole(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return user.getRole();

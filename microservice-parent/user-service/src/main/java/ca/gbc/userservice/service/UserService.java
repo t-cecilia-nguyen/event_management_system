@@ -1,7 +1,6 @@
 package ca.gbc.userservice.service;
 
 import ca.gbc.userservice.dto.UserRequest;
-import ca.gbc.userservice.model.Role;
 import ca.gbc.userservice.model.User;
 import ca.gbc.userservice.dto.UserResponse;
 
@@ -13,6 +12,6 @@ public interface UserService {
     User getUserById(Long id);
     void updateUser(Long id, UserRequest userRequest);
     void deleteUser(Long id);
-    List<User> checkAllRole(Role role);
-    Role checkUserRole(Long id);
+    List<User> checkAllRole(String role);
+    String checkUserRole(Long id);
 }
