@@ -1,6 +1,7 @@
 package ca.gbc.roomservice;
 
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,6 +108,18 @@ class RoomServiceApplicationTests {
                     .body("features", Matchers.equalTo(room[2]))
                     .body("availability", Matchers.equalTo(Boolean.parseBoolean(room[3])));
         }
+
+        System.out.println("SEED = " + seedRooms.length);
+        System.out.println("ROOM = " + rooms.length);
+
+        Response response = RestAssured.given()
+                .contentType("application/json")
+                .when()
+                .get("/rooms")
+                .then()
+                .log().all()
+                .statusCode(200)
+                .extract().response();
 
         // Verify that the list contains all seed and test rooms
         RestAssured.given()

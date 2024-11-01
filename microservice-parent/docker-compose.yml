@@ -9,6 +9,22 @@ version: '3.9'
 
 services:
 
+  user-service:
+    image: user-service
+    container_name: user-service
+    ports:
+      - "8085:8085"
+    build:
+      context: ./user-service
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://user-postgres:5433/user-service
+    depends_on:
+      - user-postgres
+    networks:
+      - spring
+
   room-service:
     image: room-service
     container_name: room-service
@@ -20,13 +36,28 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
-      - postgres
+      - room-postgres
     networks:
       - spring
 
-  postgres:
+  user-postgres:
     image: postgres:latest
-    container_name: postgres-event-booking
+    container_name: user-postgres
+    ports:
+      - "5433:5433"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./data/postgres/users:/var/lib/postgresql/data
+      - ./local-docker-file/postgres/init/user/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - spring
+    restart: unless-stopped
+
+  room-postgres:
+    image: postgres:latest
+    container_name: room-postgres
     ports:
       - "5432:5432"
     environment:
