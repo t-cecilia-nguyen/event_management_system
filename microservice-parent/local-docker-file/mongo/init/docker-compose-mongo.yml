@@ -1,0 +1,42 @@
+# -----------------------------------------------------
+# 1. docker-compose -p microservice-comp3095-ecommerce -f docker-compose-single.yml up -d
+# -p (for all services, encapsulated in a folder) -f (docker-compose file name) up (bring them up) -d (run in a detach terminal)
+
+version: '3.9'
+
+services:
+
+  # Our dependent service
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    environment:    # read from documentation
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:    # preserve and persist data on my hard drive
+      - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
+      #  script initializes database with user permissions under directory: init/mongo/docker-entrypoint-initdb.d/mongo-init.js/
+      - ./init/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./data/order:/var/lib/postgresql/data
+      - ./init/order/init.sql:/docker-entrypoint-initdb.d/init.sql
+    container_name: mongodb-event
+
+
+
+
+  # Our dependent service
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONG0DB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event:27017/
+
+    container_name: mongo-express-event
+    depends_on:
+      - mongodb
+
+
