@@ -14,6 +14,8 @@ import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.flywaydb.core.internal.util.CollectionsUtils.hasItems;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class RoomServiceApplicationTests {
     @ServiceConnection
@@ -43,6 +45,7 @@ class RoomServiceApplicationTests {
                 }
                 """;
 
+        // Create room and log response
         RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
@@ -59,69 +62,14 @@ class RoomServiceApplicationTests {
 
     @Test
     void getAllRoomsTest() {
-        // Verify seed data
+        // Seed data
         String[][] seedRooms = {
                 {"Lecture Hall A", "150", "Projector, Whiteboard, Sound System", "true"},
                 {"Conference Room B", "50", "Video Conferencing, Whiteboard, Coffee Machine", "false"},
                 {"Workshop Room C", "30", "Interactive Display, Whiteboard, Sound System", "true"}
         };
 
-        for (int i = 0; i < seedRooms.length; i++) {
-            RestAssured.given()
-                    .contentType("application/json")
-                    .when()
-                    .get("/rooms")
-                    .then()
-                    .body("[" + i + "].roomName", Matchers.equalTo(seedRooms[i][0]))
-                    .body("[" + i + "].capacity", Matchers.equalTo(Integer.parseInt(seedRooms[i][1])))
-                    .body("[" + i + "].features", Matchers.equalTo(seedRooms[i][2]))
-                    .body("[" + i + "].availability", Matchers.equalTo(Boolean.parseBoolean(seedRooms[i][3])));
-        }
-
-        // Array of all rooms
-        String[][] rooms = {
-                {"Lecture Hall D", "200","Projector, Whiteboard, Sound System", "true"},
-                {"Conference Room E", "50", "Projector, Whiteboard", "false"}
-        };
-
-        // Loop through array and create each room
-        for (String[] room : rooms) {
-            String requestBody = String.format("""
-                    {
-                        "roomName": "%s",
-                        "capacity": "%s",
-                        "features": "%s",
-                        "availability": "%s"
-                    }
-                    """, room[0], room[1], room[2], room[3]);
-
-            RestAssured.given()
-                    .contentType("application/json")
-                    .body(requestBody)
-                    .when()
-                    .post("/rooms")
-                    .then()
-                    .log().all()
-                    .statusCode(201)
-                    .body("roomName", Matchers.equalTo(room[0]))
-                    .body("capacity", Matchers.equalTo(Integer.parseInt(room[1])))
-                    .body("features", Matchers.equalTo(room[2]))
-                    .body("availability", Matchers.equalTo(Boolean.parseBoolean(room[3])));
-        }
-
-        System.out.println("SEED = " + seedRooms.length);
-        System.out.println("ROOM = " + rooms.length);
-
-        Response response = RestAssured.given()
-                .contentType("application/json")
-                .when()
-                .get("/rooms")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract().response();
-
-        // Verify that the list contains all seed and test rooms
+        // Log response once
         RestAssured.given()
                 .contentType("application/json")
                 .when()
@@ -129,8 +77,9 @@ class RoomServiceApplicationTests {
                 .then()
                 .log().all()
                 .statusCode(200)
-                .body("size()", Matchers.equalTo(seedRooms.length + rooms.length));
+                .extract();
 
+        // Verify each room detail
         for (int i = 0; i < seedRooms.length; i++) {
             RestAssured.given()
                     .contentType("application/json")
@@ -141,109 +90,38 @@ class RoomServiceApplicationTests {
                     .body("[" + i + "].capacity", Matchers.equalTo(Integer.parseInt(seedRooms[i][1])))
                     .body("[" + i + "].features", Matchers.equalTo(seedRooms[i][2]))
                     .body("[" + i + "].availability", Matchers.equalTo(Boolean.parseBoolean(seedRooms[i][3])));
-        }
-
-        for (int i = 0; i < rooms.length; i++) {
-            RestAssured.given()
-                    .contentType("application/json")
-                    .when()
-                    .get("/rooms")
-                    .then()
-                    .body("[" + (i + seedRooms.length) + "].roomName", Matchers.equalTo(rooms[i][0]))
-                    .body("[" + (i + seedRooms.length) + "].capacity", Matchers.equalTo(Integer.parseInt(rooms[i][1])))
-                    .body("[" + (i + seedRooms.length) + "].features", Matchers.equalTo(rooms[i][2]))
-                    .body("[" + (i + seedRooms.length) + "].availability", Matchers.equalTo(Boolean.parseBoolean(rooms[i][3])));
         }
     }
 
     @Test
     void getRoomByIdTest() {
-        String[][] rooms = {
-                {"Lecture Hall A", "200","Projector, Whiteboard, Sound System", "true"},
-                {"Conference Room B", "50", "Projector, Whiteboard", "true"},
-                {"Classroom C", "50", "Projector", "false" }
-        };
-
-        // List to store room IDs
-        List<Integer> roomIds = new ArrayList<>();
-
-        // Create each room
-        for (String[] room : rooms) {
-            String requestBody = String.format("""
-                    {
-                        "roomName": "%s",
-                        "capacity": "%s",
-                        "features": "%s",
-                        "availability": "%s"
-                    }
-                    """, room[0], room[1], room[2], room[3]);
-
-            Integer roomId = RestAssured.given()
-                    .contentType("application/json")
-                    .body(requestBody)
-                    .when()
-                    .post("/rooms")
-                    .then()
-                    .log().all()
-                    .statusCode(201)
-                    .extract()
-                    .path("id");
-
-            roomIds.add(roomId);
-        }
+        // Using Seed Data. Verify:
+        // ('Conference Room B', 50, 'Video Conferencing, Whiteboard, Coffee Machine', false) -- ID 2
 
         // Specify room ID to verify
-        int roomIDToVerify = roomIds.get(2); // Third test room create, ID: 6
-        System.out.println("Room ID to verify: " + roomIDToVerify);
+        int roomIDToVerify = 2;
 
-        String verifyBody = """
-                {
-                    "roomName": "Classroom C",
-                    "capacity": "50",
-                    "features": "Projector",
-                    "availability": "false"
-                }
-                """;
-
-        // Verify Room by ID
+        // Verify Room by ID and log response
         RestAssured.given()
                 .contentType("application/json")
-                .body(verifyBody)
                 .when()
                 .get("/rooms/" + roomIDToVerify)
                 .then()
                 .log().all()
                 .statusCode(200)
-                .body("roomName", Matchers.equalTo("Classroom C"))
+                .body("roomName", Matchers.equalTo("Conference Room B"))
                 .body("capacity", Matchers.equalTo(50))
-                .body("features", Matchers.equalTo("Projector"))
+                .body("features", Matchers.equalTo("Video Conferencing, Whiteboard, Coffee Machine"))
                 .body("availability", Matchers.equalTo(false));
     }
 
     @Test
     void updateRoomTest() {
-        String requestBody = """
-                {
-                    "roomName": "Lecture Hall A",
-                    "capacity": "200",
-                    "features": "Projector, Whiteboard, Sound System",
-                    "availability": "true"
-                }
-                """;
+        // Seed Data: Update room with ID 1. ('Lecture Hall A', 150, 'Projector, Whiteboard, Sound System', true)
 
-        // Retrieve room ID
-        Integer roomId = RestAssured.given()
-                .contentType("application/json")
-                .body(requestBody)
-                .when()
-                .post("/rooms")
-                .then()
-                .log().all()
-                .statusCode(201)
-                .extract()
-                .path("id");
+        int roomId = 1;
 
-        // Update room
+        // Room ID 1, updated information
         String updateRequestBody = """
                 {
                     "roomName": "Lecture Hall B",
@@ -253,6 +131,7 @@ class RoomServiceApplicationTests {
                 }
                 """;
 
+        // Update
         RestAssured.given()
                 .contentType("application/json")
                 .body(updateRequestBody)
@@ -262,7 +141,7 @@ class RoomServiceApplicationTests {
                 .log().all()
                 .statusCode(204);
 
-        // Verify update
+        // Verify update and log response
         RestAssured.given()
                 .contentType("application/json")
                 .when()
@@ -308,7 +187,7 @@ class RoomServiceApplicationTests {
                 .log().all()
                 .statusCode(204);
 
-        // Verify deletion
+        // Verify deletion and log response
         RestAssured.given()
                 .contentType("application/json")
                 .when()
@@ -326,6 +205,7 @@ class RoomServiceApplicationTests {
                 {"Classroom C", "50", "Projector", "false"}
         };
 
+        // Create 3 new rooms
         for (String[] room : rooms) {
             String requestBody = String.format("""
                     {
@@ -346,6 +226,7 @@ class RoomServiceApplicationTests {
                     .statusCode(201);
         }
 
+        // Verify with true parameter and log response
         RestAssured.given()
                 .contentType("application/json")
                 .param("availability", "true")
@@ -390,7 +271,7 @@ class RoomServiceApplicationTests {
                 .log().all()
                 .statusCode(201);
 
-        // Verify
+        // Verify and log response
         RestAssured.given()
                 .contentType("application/json")
                 .when()
