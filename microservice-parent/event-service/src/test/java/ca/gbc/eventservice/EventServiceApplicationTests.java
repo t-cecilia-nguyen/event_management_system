@@ -1,6 +1,5 @@
 package ca.gbc.eventservice;
 
-import ca.gbc.eventservice.model.Booking;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
@@ -42,32 +41,20 @@ class EventServiceApplicationTests {
         mongoDBContainer.start();
     }
 
-  //  @Autowired
-   // private TestRestTemplate restTemplate;
-
-
-//    @Test
-//    public void testEndPoint(){
-//        String endpoint =  "/api/booking";
-//        ResponseEntity<String> response = restTemplate.getForEntity(endpoint, String.class);
-//
-//       }
 
 
     @Test
     public void testCreateEvent() {
-        String bookingId = "book456"; // Replace with an actual bookingId or mock data
-        String endpoint = "/api/event/" + bookingId;
+        long userId = 1;
+        String endpoint = "/api/event" + "?userId=" + userId;
 
         String eventRequest = """
        {
             "eventName": "Sample Event",
             "eventType": "Conference",
-            "expectedAttendees": 100
+            "expectedAttendees": 44
        }
        """;
-
-
 
 
         RestAssured.given()
@@ -78,30 +65,30 @@ class EventServiceApplicationTests {
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .log().all()
-                .header("Location", Matchers.containsString("/api/event/"))
+                .header("Location", Matchers.containsString("/api/event"))
                 .contentType(ContentType.JSON)
                 .body("id", Matchers.notNullValue())
                 .body("eventName", Matchers.equalTo("Sample Event"))
                 .body("eventType", Matchers.equalTo("Conference"))
-                .body("organizerId", Matchers.equalTo("USER123"))
-                .body("bookingId", Matchers.equalTo(bookingId))
-                .body("expectedAttendees", Matchers.equalTo(100));
+                .body("organizerId", Matchers.equalTo(1))
+                .body("expectedAttendees", Matchers.equalTo(44));
     }
 
 
     @Test
     public void testGetAllEvents() {
-
-        String bookingId = "book222"; // Replace with an actual bookingId or mock data
-        String endpoint = "/api/event/" + bookingId;
+        long userId = 1;
+        String endpoint = "/api/event" + "?userId=" + userId;
 
         String eventRequest = """
        {
             "eventName": "Sample Event",
             "eventType": "Conference",
-            "expectedAttendees": 100
+            "expectedAttendees": 44
        }
        """;
+
+
 
 
         RestAssured.given()
@@ -112,51 +99,49 @@ class EventServiceApplicationTests {
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .log().all()
-                .header("Location", Matchers.containsString("/api/event/"))
+                .header("Location", Matchers.containsString("/api/event"))
                 .contentType(ContentType.JSON)
                 .body("id", Matchers.notNullValue())
                 .body("eventName", Matchers.equalTo("Sample Event"))
                 .body("eventType", Matchers.equalTo("Conference"))
-                .body("organizerId", Matchers.equalTo("USER123"))
-                .body("bookingId", Matchers.equalTo(bookingId))
-                .body("expectedAttendees", Matchers.equalTo(100));
-
+                .body("organizerId", Matchers.equalTo(1))
+                .body("expectedAttendees", Matchers.equalTo(44));
 
 
         RestAssured.given()
                 .when()
                 .get("/api/event/")
                 .then()
-                .statusCode(HttpStatus.OK.value())  // Check for 200 OK status
+                .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
                 .log().all()
-                .body("size()", Matchers.greaterThan(0))  // Ensure there's at least one event in the response
-                .body("[0].id", Matchers.notNullValue())  // Check that the first item has a non-null ID
-                .body("[0].eventName",  Matchers.equalTo("Sample Event"))  // Ensure `eventName` is not null
-                .body("[0].eventType", Matchers.equalTo("Conference"))  // Ensure `eventType` is not null
-                .body("[0].organizerId", Matchers.equalTo("USER123"))  // Ensure `organizerId` is not null
-                .body("[0].bookingId", Matchers.equalTo(bookingId))  // Ensure `bookingId` is not null
-                .body("[0].expectedAttendees",  Matchers.equalTo(100));  // Ensure `expectedAttendees` is positive
+                .body("size()", Matchers.greaterThan(0))
+                .body("[0].id", Matchers.notNullValue())
+                .body("[0].eventName",  Matchers.equalTo("Sample Event"))
+                .body("[0].eventType", Matchers.equalTo("Conference"))
+                .body("[0].organizerId", Matchers.equalTo(1))
+                .body("[0].expectedAttendees",  Matchers.equalTo(44));
     }
 
 
 
     @Test
-    void testBookingServiceIntegration() {
-        ResponseEntity<Booking> response = restTemplate.getForEntity("http://localhost:8096/api/booking/foo", Booking.class);
+    void testUserServiceIntegration() {
+        long userId = 1;
+
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8092/users/"+userId+"/role", String.class);
         System.out.println("Response Status: " + response.getStatusCode());
         System.out.println("Response Body: " + response.getBody());
 
         RestAssured.given()
                 .when()
-                .get("http://localhost:8096/api/booking/foo")
+                .get("http://localhost:8092/users/"+userId+"/role")
                 .then()
-                .statusCode(HttpStatus.OK.value())  // Check for 200 OK status
-                .contentType(ContentType.JSON)
+                .statusCode(HttpStatus.OK.value())
+                .contentType(ContentType.TEXT)
                 .log().all()
-                .body("bookingId", Matchers.equalTo("foo"))
-                .body("userId", Matchers.equalTo("USER123"))
-                .body("roomId", Matchers.equalTo("R123"));
+                .body( Matchers.equalTo("staff"));
+
     }
 
 }

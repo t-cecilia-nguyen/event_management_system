@@ -2,7 +2,7 @@ package ca.gbc.eventservice.service;
 
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
-import ca.gbc.eventservice.model.Booking;
+import ca.gbc.eventservice.exception.UserRoleException;
 import ca.gbc.eventservice.model.Event;
 import ca.gbc.eventservice.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,48 +26,67 @@ public class EventServiceImpl implements EventService{
     private final RestTemplate restTemplate;
 
 
-    private Booking getBookingById(String id) {
-        String url = "http://booking-service/api/booking/" + id;
-        System.out.println("Calling Booking URL: " + url);
+    private String checkUserRole(Long id) {
+        String url = "http://user-service/users/" + id +"/role";
+        System.out.println("Calling User-Service URL: " + url);
 
-        Booking booking = restTemplate.getForObject(url, Booking.class);
+        String userRole = restTemplate.getForObject(url, String.class);
 
-        if (booking != null) {
-            return booking;
+        if (userRole != null) {
+            return userRole;
         }
         return null;
     }
 
     @Override
-    public EventResponse createEvent(String bookingId, EventRequest eventRequest) {
+    public EventResponse createEvent(Long userid, EventRequest eventRequest) throws UserRoleException {
 
-        //get booking
-        Booking booking = this.getBookingById(bookingId);
+        //get User
+        String userRole = this.checkUserRole(userid);
 
-        //put together booking and event
-        if (booking != null) {
-            Event event = Event.builder()
-                    .eventName(eventRequest.eventName())
-                    .eventType(eventRequest.eventType())
-                    .organizerId(booking.getUserId())
-                    .bookingId(booking.getBookingId())
-                    .expectedAttendees(eventRequest.expectedAttendees())
-                    .build();
-
-            eventRepository.save(event);
-
-            log.info("New Event {} is saved", eventRequest.eventName());
-            return new EventResponse(
-                    event.getId(),
-                    event.getEventName(),
-                    event.getEventType(),
-                    event.getOrganizerId(),
-                    event.getBookingId(),
-                    event.getExpectedAttendees()
-            );
+        if (userRole == null) {
+            throw new UserRoleException("unknown", "User role not recognized or not authorized to create events.");
         }
 
-        return null;
+        //check userRole and before creating event
+        switch (userRole.toLowerCase()) {
+            case "student":
+                if (eventRequest.expectedAttendees() >= 100) {
+                    throw new UserRoleException(userRole, "Cannot create event with more than 100 attendees.");
+                }
+                break;
+            case "faculty":
+                if (eventRequest.expectedAttendees() >= 500) {
+                    throw new UserRoleException(userRole, "Cannot create event with more than 500 attendees.");
+                }
+                break;
+            case "staff":
+                if (eventRequest.expectedAttendees() >= 50) {
+                    throw new UserRoleException(userRole, "Cannot create event with more than 50 attendees.");
+                }
+                break;
+            default:
+                break;
+        }
+
+        Event event = Event.builder()
+                .eventName(eventRequest.eventName())
+                .eventType(eventRequest.eventType())
+                .organizerId(userid)
+                .expectedAttendees(eventRequest.expectedAttendees())
+                .build();
+
+        eventRepository.save(event);
+
+        log.info("New Event {} is saved", eventRequest.eventName());
+
+        return new EventResponse(
+                event.getId(),
+                event.getEventName(),
+                event.getEventType(),
+                event.getOrganizerId(),
+                event.getExpectedAttendees()
+        );
 
     }
 
@@ -86,7 +105,6 @@ public class EventServiceImpl implements EventService{
                 event.getEventName(),
                 event.getEventType(),
                 event.getOrganizerId(),
-                event.getBookingId(),
                 event.getExpectedAttendees()
         );
     }
@@ -105,6 +123,7 @@ public class EventServiceImpl implements EventService{
         if(event != null){
             event.setEventName(eventRequest.eventName());
             event.setEventType(eventRequest.eventType());
+            //event.setOrganizerId(eventRequest.organizerId());
             event.setExpectedAttendees(eventRequest.expectedAttendees());
 
             log.info("Event with Id {} is updated", eventId);

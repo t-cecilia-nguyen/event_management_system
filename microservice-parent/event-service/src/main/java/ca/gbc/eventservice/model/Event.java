@@ -19,7 +19,6 @@ public class Event {
     private String eventName;
     private String eventType;
 
-    private String bookingId;
-    private String organizerId;
+    private Long organizerId;
     private Integer expectedAttendees;
 }

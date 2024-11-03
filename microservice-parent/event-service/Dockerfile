@@ -41,7 +41,7 @@ ENV MONGO_DB_USERNAME=admin \
     MONGO_DB_PWD=password
 
 #Inform Docker that the container listens on the specified network ports at runtime.
-EXPOSE 8095
+EXPOSE 8098
 
 #Allow you to configure a container that will run as an executable
 #or basically how to run the program (Shell form, and EXEC form)

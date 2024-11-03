@@ -9,11 +9,66 @@ version: '3.9'
 
 services:
 
+
+  eureka-server:
+    build:
+      context: ./discovery-server
+      dockerfile: ./Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+
+  event-service:
+    image: event-service
+    ports:
+      - "8098:8098"
+    build:
+      context: ./event-service
+      dockerfile: ./Dockerfile
+    container_name: product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - eureka-server
+      - mongodb-event-service
+    networks:
+      - spring
+
+
+  mongodb-event-service:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    environment: # read from documentation
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes: # preserve and persist data on my hard drive
+      - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    container_name: mongodb-event-service
+
+
+  mongo-express-event:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONG0DB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017/
+
+    container_name: mongo-express-event-service
+    depends_on:
+      - mongodb-event-service
+
+
+
+
   user-service:
     image: user-service
     container_name: user-service
     ports:
-      - "8085:8085"
+      - "8097:8097"
     build:
       context: ./user-service
       dockerfile: ./Dockerfile
@@ -28,7 +83,7 @@ services:
     image: room-service
     container_name: room-service
     ports:
-      - "8084:8084"
+      - "8095:8095"
     build:
       context: ./room-service
       dockerfile: ./Dockerfile
