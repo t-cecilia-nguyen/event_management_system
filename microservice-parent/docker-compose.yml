@@ -58,7 +58,7 @@ services:
     image: postgres:latest
     container_name: room-postgres
     ports:
-      - "5432:5432"
+      - "5439:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
