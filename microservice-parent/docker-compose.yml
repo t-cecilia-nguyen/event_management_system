@@ -17,6 +17,10 @@ services:
     container_name: eureka-server
     ports:
       - "8761:8761"
+    networks:
+      - spring
+
+
 
   event-service:
     image: event-service
@@ -25,9 +29,10 @@ services:
     build:
       context: ./event-service
       dockerfile: ./Dockerfile
-    container_name: product-service
+    container_name: event-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
     depends_on:
       - eureka-server
       - mongodb-event-service
@@ -44,11 +49,11 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes: # preserve and persist data on my hard drive
       - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
-      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./local-docker-file/mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     container_name: mongodb-event-service
 
 
-  mongo-express-event:
+  mongo-express:
     image: mongo-express
     ports:
       - "8082:8081"
@@ -57,7 +62,7 @@ services:
       ME_CONFIG_MONG0DB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017/
 
-    container_name: mongo-express-event-service
+    container_name: mongo-express
     depends_on:
       - mongodb-event-service
 
@@ -74,8 +79,10 @@ services:
       dockerfile: ./Dockerfile
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://eureka-server:8761/eureka/
     depends_on:
       - user-postgres
+      - eureka-server
     networks:
       - spring
 
