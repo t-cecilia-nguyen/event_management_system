@@ -3,6 +3,8 @@ package ca.gbc.eventservice.controller;
 
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.exception.UserRoleException;
+import ca.gbc.eventservice.model.RoleErrorResponse;
 import ca.gbc.eventservice.service.EventService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -20,22 +22,33 @@ import java.util.List;
 public class EventController {
     private final EventService eventService;
 
-    @PostMapping("/{bookingId}")
-    public ResponseEntity<EventResponse> createEvent(@PathVariable("bookingId") String bookingId, @RequestBody EventRequest eventRequest) {
-        EventResponse eventResponse = eventService.createEvent(bookingId, eventRequest);
+    @PostMapping
+    public ResponseEntity<?> createEvent(@RequestParam("userId") Long userId, @RequestBody EventRequest eventRequest) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location" , "/api/event/" + eventResponse.id());
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(eventResponse);
+        try {
+            EventResponse eventResponse = eventService.createEvent(userId, eventRequest);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Location" , "/api/event/" + eventResponse.id());
+
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(headers)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(eventResponse);
+        } catch (UserRoleException e) { //403
+            System.out.println(new RoleErrorResponse(e.getRole(), e.getMessage()));
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RoleErrorResponse(e.getRole(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RoleErrorResponse("internal_error", "An unexpected error occurred."));
+        }
+
+
     }
 
 
-    @GetMapping("/")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventResponse> getAllEvents() { return eventService.getAllEvents(); }
 

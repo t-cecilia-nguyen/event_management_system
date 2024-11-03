@@ -9,10 +9,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/microservice-parent" />
-            <option value="$PROJECT_DIR$/microservice-parent/booking-service" />
             <option value="$PROJECT_DIR$/microservice-parent/discovery-server" />
             <option value="$PROJECT_DIR$/microservice-parent/event-service" />
             <option value="$PROJECT_DIR$/microservice-parent/room-service" />
+            <option value="$PROJECT_DIR$/microservice-parent/user-service" />
           </set>
         </option>
       </GradleProjectSettings>
