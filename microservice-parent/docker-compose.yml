@@ -44,7 +44,7 @@ services:
     image: postgres:latest
     container_name: user-postgres
     ports:
-      - "5433:5433"
+      - "5439:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
