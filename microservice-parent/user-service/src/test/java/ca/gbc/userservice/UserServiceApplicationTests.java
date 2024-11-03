@@ -185,11 +185,10 @@ class UserServiceApplicationTests {
                 .contentType("application/json")
                 .param("userType", "STAFF")
                 .when()
-                .get("/users/userType")
+                .get("/users/usertype")
                 .then()
                 .log().all()
                 .statusCode(200);
-
     }
 
     @Test
@@ -200,7 +199,7 @@ class UserServiceApplicationTests {
         RestAssured.given()
                 .contentType("applicaiton/json")
                 .when()
-                .get("/users/1/userType")
+                .get("/users/1/usertype")
                 .then()
                 .log().all()
                 .statusCode(200)

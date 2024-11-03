@@ -60,13 +60,13 @@ public class UserController {
         userService.deleteUser(id);
     }
 
-    @GetMapping("/userType")
+    @GetMapping("/usertype")
     @ResponseStatus(HttpStatus.OK)
     public List<User> checkAllUserType(@RequestParam String userType) {
         return userService.checkAllUserType(userType);
     }
 
-    @GetMapping("{id}/userType")
+    @GetMapping("{id}/usertype")
     @ResponseStatus(HttpStatus.OK)
     public String checkUserRole(@PathVariable Long id) {
         return userService.checkUserType(id);
