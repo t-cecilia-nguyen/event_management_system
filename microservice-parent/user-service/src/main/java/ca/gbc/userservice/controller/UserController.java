@@ -48,25 +48,25 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("id") Long id,
                            @RequestBody UserRequest userRequest) {
         userService.updateUser(id, userRequest);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
 
-    @GetMapping("/role")
+    @GetMapping("/userType")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> checkAllUserType(@RequestParam String role) {
-        return userService.checkAllUserType(role);
+    public List<User> checkAllUserType(@RequestParam String userType) {
+        return userService.checkAllUserType(userType);
     }
 
-    @GetMapping("{id}/role")
+    @GetMapping("{id}/userType")
     @ResponseStatus(HttpStatus.OK)
     public String checkUserRole(@PathVariable Long id) {
         return userService.checkUserType(id);

@@ -20,6 +20,6 @@ public class User {
     private String userType;
 }
 
-// Role: PROFESSOR, ADMINISTRATOR, TECHNICIAN
+// Role: STUDENT, PROFESSOR, ADMINISTRATOR, TECHNICIAN
 
 // UserType: STUDENT, STAFF, FACULTY
