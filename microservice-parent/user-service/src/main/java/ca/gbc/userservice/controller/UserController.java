@@ -62,13 +62,13 @@ public class UserController {
 
     @GetMapping("/role")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> checkAllRole(@RequestParam String role) {
-        return userService.checkAllRole(role);
+    public List<User> checkAllUserType(@RequestParam String role) {
+        return userService.checkAllUserType(role);
     }
 
     @GetMapping("{id}/role")
     @ResponseStatus(HttpStatus.OK)
     public String checkUserRole(@PathVariable Long id) {
-        return userService.checkUserRole(id);
+        return userService.checkUserType(id);
     }
 }

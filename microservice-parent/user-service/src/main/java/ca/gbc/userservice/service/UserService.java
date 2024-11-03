@@ -12,6 +12,6 @@ public interface UserService {
     User getUserById(Long id);
     void updateUser(Long id, UserRequest userRequest);
     void deleteUser(Long id);
-    List<User> checkAllRole(String role);
-    String checkUserRole(Long id);
+    List<User> checkAllUserType(String userType);
+    String checkUserType(Long id);
 }

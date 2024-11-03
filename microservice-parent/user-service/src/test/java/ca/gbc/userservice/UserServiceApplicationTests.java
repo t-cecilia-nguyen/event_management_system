@@ -36,7 +36,7 @@ class UserServiceApplicationTests {
                 {
                     "name" : "Trang Nguyen",
                     "email" : "trang.nguyen3@georgebrown.ca",
-                    "role" : "STUDENT",
+                    "role" : "USER",
                     "userType" : "STUDENT"
                 }
                 """;
@@ -51,7 +51,7 @@ class UserServiceApplicationTests {
                 .statusCode(201)
                 .body("name", Matchers.equalTo("Trang Nguyen"))
                 .body("email", Matchers.equalTo("trang.nguyen3@georgebrown.ca"))
-                .body("role", Matchers.equalTo("STUDENT"))
+                .body("role", Matchers.equalTo(Role.))
                 .body("userType", Matchers.equalTo("STUDENT"));
     }
 
