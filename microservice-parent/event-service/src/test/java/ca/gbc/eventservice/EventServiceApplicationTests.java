@@ -1,40 +1,43 @@
 package ca.gbc.eventservice;
 
+import ca.gbc.eventservice.stub.UserClientStub;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.testcontainers.containers.MongoDBContainer;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = EventServiceApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EventServiceApplicationTests {
+
+    private WireMockServer wireMockServer;
+
     @ServiceConnection
     static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
 
     @LocalServerPort
     private Integer port;
 
-
-    @Autowired
-    private TestRestTemplate restTemplate;
-
-
-
     @BeforeEach
     void setup() {
+        wireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().port(8080));
+        wireMockServer.start();
         RestAssured.baseURI = "http://localhost";
         RestAssured.port = port;
+    }
+
+    @AfterEach
+    void teardown() {
+        wireMockServer.stop();
     }
 
     static {
@@ -45,23 +48,30 @@ class EventServiceApplicationTests {
 
     @Test
     public void testCreateEvent() {
-        long userId = 1;
-        String endpoint = "/api/event" + "?userId=" + userId;
+        long userId =1;
 
-        String eventRequest = """
+        String eventRequest = String.format("""
        {
             "eventName": "Sample Event",
             "eventType": "Conference",
+            "organizerId": %d,
             "expectedAttendees": 44
        }
-       """;
+       """, userId);
+
+
+        //user client stub
+
+
+        UserClientStub.stubUserCall(userId);
+        //--> will hardcoded returning staff
 
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(eventRequest)
                 .when()
-                .post(endpoint)
+                .post("/api/event")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .log().all()
@@ -77,25 +87,29 @@ class EventServiceApplicationTests {
 
     @Test
     public void testGetAllEvents() {
-        long userId = 1;
-        String endpoint = "/api/event" + "?userId=" + userId;
 
-        String eventRequest = """
+        long userId =1;
+
+        String eventRequest = String.format("""
        {
             "eventName": "Sample Event",
             "eventType": "Conference",
+            "organizerId": %d,
             "expectedAttendees": 44
        }
-       """;
+       """, userId);
 
 
+        //user client stub
+        UserClientStub.stubUserCall(userId);
+        //-->  hardcoded returning staff
 
 
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(eventRequest)
                 .when()
-                .post(endpoint)
+                .post("/api/event")
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
                 .log().all()
@@ -110,7 +124,7 @@ class EventServiceApplicationTests {
 
         RestAssured.given()
                 .when()
-                .get("/api/event/")
+                .get("/api/event")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .contentType(ContentType.JSON)
@@ -123,25 +137,5 @@ class EventServiceApplicationTests {
                 .body("[0].expectedAttendees",  Matchers.equalTo(44));
     }
 
-
-
-    @Test
-    void testUserServiceIntegration() {
-        long userId = 1;
-
-        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8092/users/"+userId+"/role", String.class);
-        System.out.println("Response Status: " + response.getStatusCode());
-        System.out.println("Response Body: " + response.getBody());
-
-        RestAssured.given()
-                .when()
-                .get("http://localhost:8092/users/"+userId+"/role")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .contentType(ContentType.TEXT)
-                .log().all()
-                .body( Matchers.equalTo("staff"));
-
-    }
 
 }

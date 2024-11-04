@@ -1,5 +1,6 @@
 package ca.gbc.eventservice.service;
 
+import ca.gbc.eventservice.client.UserClient;
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
 import ca.gbc.eventservice.exception.UserRoleException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -23,32 +25,19 @@ public class EventServiceImpl implements EventService{
 
     private final EventRepository eventRepository;
     private final MongoTemplate mongoTemplate;
-    private final RestTemplate restTemplate;
+    private final UserClient userClient ;
 
-
-    private String checkUserRole(Long id) {
-        String url = "http://user-service/users/" + id +"/role";
-        System.out.println("Calling User-Service URL: " + url);
-
-        String userRole = restTemplate.getForObject(url, String.class);
-
-        if (userRole != null) {
-            return userRole;
-        }
-        return null;
-    }
 
     @Override
-    public EventResponse createEvent(Long userid, EventRequest eventRequest) throws UserRoleException {
+    public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException {
 
-        //get User
-        String userRole = this.checkUserRole(userid);
+        //check userRole
+        var userRole = userClient.checkUserRole(eventRequest.organizerId());
 
         if (userRole == null) {
             throw new UserRoleException("unknown", "User role not recognized or not authorized to create events.");
         }
 
-        //check userRole and before creating event
         switch (userRole.toLowerCase()) {
             case "student":
                 if (eventRequest.expectedAttendees() >= 100) {
@@ -61,8 +50,8 @@ public class EventServiceImpl implements EventService{
                 }
                 break;
             case "staff":
-                if (eventRequest.expectedAttendees() >= 50) {
-                    throw new UserRoleException(userRole, "Cannot create event with more than 50 attendees.");
+                if (eventRequest.expectedAttendees() >= 200) {
+                    throw new UserRoleException(userRole, "Cannot create event with more than 200 attendees.");
                 }
                 break;
             default:
@@ -72,7 +61,7 @@ public class EventServiceImpl implements EventService{
         Event event = Event.builder()
                 .eventName(eventRequest.eventName())
                 .eventType(eventRequest.eventType())
-                .organizerId(userid)
+                .organizerId(eventRequest.organizerId())
                 .expectedAttendees(eventRequest.expectedAttendees())
                 .build();
 

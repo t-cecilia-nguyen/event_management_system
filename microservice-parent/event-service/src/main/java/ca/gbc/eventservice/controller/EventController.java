@@ -23,11 +23,11 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    public ResponseEntity<?> createEvent(@RequestParam("userId") Long userId, @RequestBody EventRequest eventRequest) {
+    public ResponseEntity<?> createEvent( @RequestBody EventRequest eventRequest) {
 
 
         try {
-            EventResponse eventResponse = eventService.createEvent(userId, eventRequest);
+            EventResponse eventResponse = eventService.createEvent( eventRequest);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location" , "/api/event/" + eventResponse.id());

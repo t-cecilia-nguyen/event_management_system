@@ -3,9 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" filepath="$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.main.iml" />
     </modules>
   </component>
 </project>
