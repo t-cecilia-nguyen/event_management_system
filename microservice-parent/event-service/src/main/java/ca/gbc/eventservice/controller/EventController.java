@@ -3,7 +3,9 @@ package ca.gbc.eventservice.controller;
 
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.exception.UserIdException;
 import ca.gbc.eventservice.exception.UserRoleException;
+import ca.gbc.eventservice.model.UserIdErrorResponse;
 import ca.gbc.eventservice.model.RoleErrorResponse;
 import ca.gbc.eventservice.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -27,19 +29,22 @@ public class EventController {
 
 
         try {
-            EventResponse eventResponse = eventService.createEvent( eventRequest);
+            EventResponse eventResponse = eventService.createEvent(eventRequest);
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add("Location" , "/api/event/" + eventResponse.id());
+            headers.add("Location", "/api/event/" + eventResponse.id());
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
                     .headers(headers)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(eventResponse);
+        }catch(UserIdException e){
+            System.out.println(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
         } catch (UserRoleException e) { //403
-            System.out.println(new RoleErrorResponse(e.getRole(), e.getMessage()));
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new RoleErrorResponse(e.getRole(), e.getMessage()));
+            System.out.println(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RoleErrorResponse("internal_error", "An unexpected error occurred."));
         }
@@ -54,9 +59,18 @@ public class EventController {
 
     @PutMapping("/{eventId}")
     public ResponseEntity<?> updateEvent(@PathVariable("eventId") String eventId,
-                                         @RequestBody EventRequest eventRequest) {
+                                         @RequestBody EventRequest eventRequest){
+        String updatedId;
+        try {
+            updatedId = eventService.updateEvent(eventId, eventRequest);
+        } catch (UserIdException e) {
+            System.out.println(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
+        }catch (UserRoleException e){
+            System.out.println(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
+        }
 
-        String updatedId = eventService.updateEvent(eventId, eventRequest);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location" , "/api/event/" + updatedId);
 

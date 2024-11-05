@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
-public class RoleErrorResponse {
-    private String role;
+public class UserIdErrorResponse {
+    private Long userId;
     private String errorMessage;
 
 }

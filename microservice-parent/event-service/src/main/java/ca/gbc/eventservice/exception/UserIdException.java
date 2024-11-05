@@ -10,15 +10,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserRoleException extends Exception {
-    String role;
+public class UserIdException extends Exception {
+
+    Long userId;
     String errorMessage;
 
     @Override
     public String toString() {
-        return "UserRoleException{" +
-                "role='" + role + '\'' +
-                ", error='" + errorMessage + '\'' +
+        return "UserIdException{" +
+                "userId=" + userId +
+                ", errorMessage='" + errorMessage + '\'' +
                 '}';
     }
 }

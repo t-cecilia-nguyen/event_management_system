@@ -47,6 +47,12 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+    @GetMapping("/exist/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    Boolean isUserExist(@PathVariable("id") Long id) {
+        return userService.isUserExist(id);
+    }
+
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void updateUser(@PathVariable("id") Long id,

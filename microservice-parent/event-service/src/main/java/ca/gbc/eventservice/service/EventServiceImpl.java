@@ -3,6 +3,7 @@ package ca.gbc.eventservice.service;
 import ca.gbc.eventservice.client.UserClient;
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.exception.UserIdException;
 import ca.gbc.eventservice.exception.UserRoleException;
 import ca.gbc.eventservice.model.Event;
 import ca.gbc.eventservice.repository.EventRepository;
@@ -11,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.UUID;
 
 
 @Service
@@ -28,11 +29,11 @@ public class EventServiceImpl implements EventService{
     private final UserClient userClient ;
 
 
-    @Override
-    public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException {
-
+    private void checkUserRole(EventRequest eventRequest) throws UserRoleException {
         //check userRole
-        var userRole = userClient.checkUserRole(eventRequest.organizerId());
+        Long organizerId = eventRequest.organizerId();
+
+        var userRole = userClient.checkUserRole(organizerId);
 
         if (userRole == null) {
             throw new UserRoleException("unknown", "User role not recognized or not authorized to create events.");
@@ -57,6 +58,22 @@ public class EventServiceImpl implements EventService{
             default:
                 break;
         }
+    }
+
+    @Override
+    public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException, UserIdException {
+
+        //check organizerId
+
+        Long organizerId = eventRequest.organizerId();
+
+        log.info("Checking if organizer ID exists: " + organizerId);
+
+        if(!userClient.isUserExist(organizerId)){ throw new UserIdException(eventRequest.organizerId(), "User Id: "+eventRequest.organizerId()+ " is not recognized."); }
+
+        //check role
+        checkUserRole(eventRequest);
+
 
         Event event = Event.builder()
                 .eventName(eventRequest.eventName())
@@ -66,8 +83,8 @@ public class EventServiceImpl implements EventService{
                 .build();
 
         eventRepository.save(event);
-
         log.info("New Event {} is saved", eventRequest.eventName());
+
 
         return new EventResponse(
                 event.getId(),
@@ -99,8 +116,9 @@ public class EventServiceImpl implements EventService{
     }
 
 
+
     @Override
-    public String updateEvent(String eventId, EventRequest eventRequest) {
+    public String updateEvent(String eventId, EventRequest eventRequest) throws UserIdException, UserRoleException {
 
         log.debug("Update Event with Id {}", eventId);
 
@@ -112,7 +130,16 @@ public class EventServiceImpl implements EventService{
         if(event != null){
             event.setEventName(eventRequest.eventName());
             event.setEventType(eventRequest.eventType());
-            //event.setOrganizerId(eventRequest.organizerId());
+
+            if(userClient.isUserExist(eventRequest.organizerId())){
+                event.setOrganizerId(eventRequest.organizerId());
+            }else{
+                throw new UserIdException(eventRequest.organizerId(), "organizerId is not recognized");
+            }
+
+            //check Role
+            checkUserRole(eventRequest);
+
             event.setExpectedAttendees(eventRequest.expectedAttendees());
 
             log.info("Event with Id {} is updated", eventId);
@@ -124,6 +151,10 @@ public class EventServiceImpl implements EventService{
     @Override
     public void deleteEvent(String eventId) {
         log.debug("Delete Event with Id {}", eventId);
+
+        if (!eventRepository.existsById(eventId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
         eventRepository.deleteById(eventId);
     }

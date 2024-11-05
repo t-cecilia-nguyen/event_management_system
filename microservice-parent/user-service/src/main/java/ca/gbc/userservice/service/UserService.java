@@ -9,6 +9,7 @@ import java.util.List;
 public interface UserService {
     UserResponse createUser(UserRequest userRequest);
     List<UserResponse> getAllUsers();
+    Boolean isUserExist(Long id);
     User getUserById(Long id);
     void updateUser(Long id, UserRequest userRequest);
     void deleteUser(Long id);

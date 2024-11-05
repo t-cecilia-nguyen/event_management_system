@@ -49,6 +49,19 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(this::mapToUserResponse).toList();
     }
 
+    @Override
+    public Boolean isUserExist(Long id) {
+        try {
+            log.info("Checking existence of user with ID: " + id);
+
+            return userRepository.existsById(id);
+        } catch (Exception e) {
+            log.error("Error checking existence of user with ID: " + id, e);
+            throw new RuntimeException("Failed to check if user exists", e);
+        }
+
+    }
+
     private UserResponse mapToUserResponse(User user) {
         return new UserResponse(
                 user.getId(),
