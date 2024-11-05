@@ -2,11 +2,11 @@ version: '3.9'
 
 services:
 
-  postgres-user-service:
+  postgres-user-mul:
     image: postgres
     ports:
       - "5438:5432"
-    container_name: postgres-user-service
+    container_name: postgres-user-mul
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
@@ -16,30 +16,18 @@ services:
 
 
 
-  postgres-room-service:
-    image: postgres
-    ports:
-      - "5439:5432"
-    container_name: postgres-room-service
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
-    volumes:
-      - ./data/room:/var/lib/postgresql/data
-      - ./postgres/init/room/init.sql:/docker-entrypoint-initdb.d/init.sql
 
-
-  pgadmin:
+  pgadmin-mul:
     image: dpage/pgadmin4
     ports:
       - "8889:80"
-    container_name: pgadmin
+    container_name: pgadmin-mul
     environment:
       - PGADMIN_DEFAULT_EMAIL=user@domain.ca
       - PGADMIN_DEFAULT_PASSWORD=password
 
 
-  mongodb-event-service:
+  mongodb-event-mul:
     image: mongo:latest
     ports:
       - "27018:27017"
@@ -49,21 +37,21 @@ services:
     volumes: # preserve and persist data on my hard drive
       - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
       - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    container_name: mongodb-event-service
+    container_name: mongodb-event-mul
 
 
 
 
   # Our dependent service
-  mongo-express-event:
+  mongo-express-event-mul:
     image: mongo-express
     ports:
       - "8082:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONG0DB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-mul:27017/
 
-    container_name: mongo-express-event-service
+    container_name: mongo-express-event-mul
     depends_on:
-      - mongodb-event-service
+      - mongodb-event-mul

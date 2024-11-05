@@ -40,17 +40,17 @@ public class EventServiceImpl implements EventService{
 
         switch (userRole.toLowerCase()) {
             case "student":
-                if (eventRequest.expectedAttendees() >= 100) {
+                if (eventRequest.expectedAttendees() > 100) {
                     throw new UserRoleException(userRole, "Cannot create event with more than 100 attendees.");
                 }
                 break;
             case "faculty":
-                if (eventRequest.expectedAttendees() >= 500) {
+                if (eventRequest.expectedAttendees() > 500) {
                     throw new UserRoleException(userRole, "Cannot create event with more than 500 attendees.");
                 }
                 break;
             case "staff":
-                if (eventRequest.expectedAttendees() >= 200) {
+                if (eventRequest.expectedAttendees() > 200) {
                     throw new UserRoleException(userRole, "Cannot create event with more than 200 attendees.");
                 }
                 break;
