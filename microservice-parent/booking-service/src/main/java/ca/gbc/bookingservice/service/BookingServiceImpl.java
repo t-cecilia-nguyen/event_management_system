@@ -2,6 +2,7 @@ package ca.gbc.bookingservice.service;
 
 import ca.gbc.bookingservice.dto.BookingRequest;
 import ca.gbc.bookingservice.dto.BookingResponse;
+import ca.gbc.bookingservice.exception.ConflictException;
 import ca.gbc.bookingservice.model.Booking;
 import ca.gbc.bookingservice.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,6 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final MongoTemplate mongoTemplate;
-
 
     @Override
     public BookingResponse createBooking(BookingRequest bookingRequest) {
@@ -76,7 +76,7 @@ public class BookingServiceImpl implements BookingService {
         log.debug("Retrieving booking with id {}", bookingId);
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking could not be found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         return mapToBookingResponse(booking);
     }
@@ -115,6 +115,10 @@ public class BookingServiceImpl implements BookingService {
     public void deleteBooking(String bookingId) {
 
         log.debug("Deleting booking with id {}", bookingId);
+
+        if (!bookingRepository.existsById(bookingId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
         bookingRepository.deleteById(bookingId);
     }

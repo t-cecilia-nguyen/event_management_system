@@ -19,7 +19,7 @@ public class Booking {
     @Id
     private String id;
     private String userId;
-    private String roomId;
+    private Long roomId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String purpose;
