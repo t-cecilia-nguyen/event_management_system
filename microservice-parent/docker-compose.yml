@@ -39,11 +39,27 @@ services:
     networks:
       - spring
 
+  approval-service:
+    image: approval-service
+    container_name: approval-service
+    ports:
+      - "8087:8087" # Map to the desired port for the approval service
+    build:
+      context: ./approval-service
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - approval-mongo
+      - user-service # Add user-service dependency if needed
+    networks:
+      - spring
+
   user-postgres:
     image: postgres:latest
     container_name: user-postgres
     ports:
-      - "5433:5432"
+      - "5439:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
@@ -58,13 +74,38 @@ services:
     image: postgres:latest
     container_name: room-postgres
     ports:
-      - "5439:5432"
+      - "5432:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
     volumes:
       - ./data/postgres/rooms:/var/lib/postgresql/data
       - ./local-docker-file/postgres/init/room/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - spring
+    restart: unless-stopped
+
+  approval-mongo:
+    image: mongo:latest
+    container_name: approval-mongo
+    ports:
+      - "27020:27017"
+    volumes:
+      - ./data/mongo/approvals:/data/db
+    networks:
+      - spring
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8091:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=approval-mongo
+      - ME_CONFIG_MONGODB_PORT=27020
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
     networks:
       - spring
     restart: unless-stopped
