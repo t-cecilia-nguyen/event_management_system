@@ -68,7 +68,7 @@ public class UserController {
 
     @GetMapping("{id}/usertype")
     @ResponseStatus(HttpStatus.OK)
-    public String checkUserRole(@PathVariable Long id) {
+    public String checkUserType(@PathVariable Long id) {
         return userService.checkUserType(id);
     }
 }
