@@ -10,14 +10,6 @@ version: '3.9'
 services:
 
 
-  eureka-server:
-    build:
-      context: ./discovery-server
-      dockerfile: ./Dockerfile
-    container_name: eureka-server
-    ports:
-      - "8761:8761"
-
   event-service:
     image: event-service
     ports:
@@ -25,11 +17,10 @@ services:
     build:
       context: ./event-service
       dockerfile: ./Dockerfile
-    container_name: product-service
+    container_name: event-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
-      - eureka-server
       - mongodb-event-service
     networks:
       - spring
