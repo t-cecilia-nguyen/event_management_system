@@ -2,7 +2,6 @@ package ca.gbc.eventservice;
 
 import ca.gbc.eventservice.stub.UserClientStub;
 import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
