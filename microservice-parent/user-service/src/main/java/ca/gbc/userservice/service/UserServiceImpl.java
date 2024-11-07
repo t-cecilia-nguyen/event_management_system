@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
         user.setUserType(userRequest.userType());
 
         // Save
-        User updatedUser = userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Override
@@ -99,14 +99,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> checkAllRole(String role) {
-        return userRepository.findByRole(role);
+    public List<User> checkAllUserType(String userType) {
+        return userRepository.findByUserType(userType);
     }
 
     @Override
-    public String checkUserRole(Long id) {
+    public String checkUserType(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return user.getRole();
+        return user.getUserType();
     }
 }
