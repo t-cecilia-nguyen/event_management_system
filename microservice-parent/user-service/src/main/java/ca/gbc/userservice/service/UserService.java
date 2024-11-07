@@ -9,9 +9,10 @@ import java.util.List;
 public interface UserService {
     UserResponse createUser(UserRequest userRequest);
     List<UserResponse> getAllUsers();
+    Boolean isUserExist(Long id);
     User getUserById(Long id);
     void updateUser(Long id, UserRequest userRequest);
     void deleteUser(Long id);
-    List<User> checkAllRole(String role);
-    String checkUserRole(Long id);
+    List<User> checkAllUserType(String userType);
+    String checkUserType(Long id);
 }

@@ -240,7 +240,6 @@ class RoomServiceApplicationTests {
     @Test
     void checkRoomAvailabilityTest() {
         // Room ID 2 = seed data
-
         // Verify
         RestAssured.given()
                 .contentType("application/json")
@@ -251,7 +250,7 @@ class RoomServiceApplicationTests {
                 .statusCode(200)
                 .body(Matchers.equalTo("false"));
 
-        // With new test room
+        // With newly created room
         String requestBody = """
             {
                 "roomName": "Study Room G",

@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 // Lombok Annotations
 @Document(value="approval") // This class is a Document (table for non-relational db)
-@Data /
+@Data
 @AllArgsConstructor // Constructors
 @NoArgsConstructor
 @Builder
