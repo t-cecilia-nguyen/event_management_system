@@ -12,4 +12,5 @@ public interface EventService {
     List<EventResponse> getAllEvents();
     String updateEvent(String id, EventRequest eventRequest) throws UserIdException, UserRoleException;
     void deleteEvent(String id);
+    EventResponse getEventById(String id);
 }

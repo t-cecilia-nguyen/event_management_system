@@ -49,7 +49,6 @@ public class EventController {
             System.out.println(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RoleErrorResponse("internal_error", "An unexpected error occurred."));
         }
 
@@ -90,6 +89,12 @@ public class EventController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+
+    @GetMapping("/{eventId}")
+    public ResponseEntity<EventResponse> getEventById(@PathVariable("eventId") String eventId){
+        EventResponse event = eventService.getEventById(eventId);
+        return ResponseEntity.ok(event);
+    }
 
 
 }

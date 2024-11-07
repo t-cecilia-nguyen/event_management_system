@@ -159,6 +159,12 @@ public class EventServiceImpl implements EventService{
         eventRepository.deleteById(eventId);
     }
 
+    @Override
+    public EventResponse getEventById(String id) {
+        Event event = eventRepository.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return mapToEventResponse(event);
+    }
 
 
 }
