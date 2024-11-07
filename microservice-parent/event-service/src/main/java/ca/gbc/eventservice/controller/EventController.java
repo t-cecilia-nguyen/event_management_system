@@ -29,7 +29,10 @@ public class EventController {
 
 
         try {
+            System.out.println("Creating event with request: " + eventRequest);
             EventResponse eventResponse = eventService.createEvent(eventRequest);
+            System.out.println("Event created successfully with ID: " + eventResponse.id());
+
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Location", "/api/event/" + eventResponse.id());
@@ -42,10 +45,11 @@ public class EventController {
         }catch(UserIdException e){
             System.out.println(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new UserIdErrorResponse(e.getUserId(), e.getErrorMessage()));
-        } catch (UserRoleException e) { //403
+        } catch (UserRoleException e) { //400
             System.out.println(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new RoleErrorResponse(e.getRole(), e.getErrorMessage()));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new RoleErrorResponse("internal_error", "An unexpected error occurred."));
         }
 
