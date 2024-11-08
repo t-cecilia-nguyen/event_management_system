@@ -47,11 +47,7 @@ public class UserController {
         return userService.getUserById(id);
     }
 
-    @GetMapping("/exist/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    Boolean isUserExist(@PathVariable("id") Long id) {
-        return userService.isUserExist(id);
-    }
+
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
@@ -72,7 +68,14 @@ public class UserController {
         return userService.checkAllUserType(userType);
     }
 
-    @GetMapping("{id}/usertype")
+
+
+    @GetMapping("/exist/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Boolean isUserExist(@PathVariable("id") Long id) {
+        return userService.isUserExist(id);
+    }
+    @GetMapping("/{id}/usertype")
     @ResponseStatus(HttpStatus.OK)
     public String checkUserType(@PathVariable Long id) {
         return userService.checkUserType(id);

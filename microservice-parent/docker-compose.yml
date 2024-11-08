@@ -29,29 +29,30 @@ services:
   mongodb-event-service:
     image: mongo:latest
     ports:
-      - "27018:27017"
-    environment: # read from documentation
+      - "27019:27017"
+    environment:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
-    volumes: # preserve and persist data on my hard drive
-      - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
-      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    volumes:
+      - ./data/mongo/events:/data/db
+      - ./local-docker-file/mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     container_name: mongodb-event-service
-
+    networks:
+      - spring
 
   mongo-express-event:
     image: mongo-express
     ports:
-      - "8082:8081"
+      - "8083:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
-      ME_CONFIG_MONG0DB_ADMINPASSWORD: password
-      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017/
-
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017
     container_name: mongo-express-event-service
     depends_on:
       - mongodb-event-service
-
+    networks:
+      - spring
 
 
 
