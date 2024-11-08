@@ -26,7 +26,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
       - ./data/mongo/approval:/data/db
-      - ./init/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js   # Initialize MongoDB with data from this script
+      - ./init/mongo/docker-entrypoint-initdb.d/mongo-approval-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js   # Initialize MongoDB with data from this script
     container_name: approval-mongodb-single
     networks:
       - spring

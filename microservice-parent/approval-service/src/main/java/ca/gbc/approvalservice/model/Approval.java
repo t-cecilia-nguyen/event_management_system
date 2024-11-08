@@ -20,6 +20,13 @@ public class Approval {
     private String id;
     private String eventId;
     private String approverId;
-    private boolean approved;
+    @Builder.Default
+    private ApprovalStatus status = ApprovalStatus.PENDING;  // Use enum and sets pending as default
     private String comments;
+
+
+    public enum ApprovalStatus {
+        PENDING, APPROVED, DENIED
+    }
+
 }

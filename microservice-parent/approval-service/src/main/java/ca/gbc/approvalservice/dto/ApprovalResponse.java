@@ -4,6 +4,6 @@ public record ApprovalResponse(
         String id,
         String eventId,
         String approverId,
-        boolean approved,
+        ca.gbc.approvalservice.model.Approval.ApprovalStatus approved,
         String comments
 ) {}

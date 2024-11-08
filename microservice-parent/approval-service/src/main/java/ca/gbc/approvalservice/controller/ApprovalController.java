@@ -24,6 +24,10 @@ public class ApprovalController {
     public ResponseEntity<ApprovalResponse> createApproval(@RequestBody ApprovalRequest approvalRequest) {
         ApprovalResponse createdApproval = approvalService.createApproval(approvalRequest);
 
+        if (createdApproval == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);  // In case creation fails
+        }
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Location", "/api/approval/" + createdApproval.id());
 

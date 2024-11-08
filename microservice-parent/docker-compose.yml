@@ -16,7 +16,7 @@ services:
     build:
       context: ./event-service
       dockerfile: ./Dockerfile
-    container_name: product-service
+    container_name: event-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -34,7 +34,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes: # preserve and persist data on my hard drive
       - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
-      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js:ro
     container_name: mongodb-event-service
 
 
@@ -46,7 +46,6 @@ services:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONG0DB_ADMINPASSWORD: password
       ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017/
-
     container_name: mongo-express-event-service
     depends_on:
       - mongodb-event-service
@@ -136,9 +135,13 @@ services:
     ports:
       - "27020:27017"
     volumes:
-      - ./data/mongo/approvals:/data/db
+      - ./data/mongo/approvals:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-approval-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js:ro
     networks:
       - spring
+    environment: # read from documentation
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
     restart: unless-stopped
 
   mongo-express:

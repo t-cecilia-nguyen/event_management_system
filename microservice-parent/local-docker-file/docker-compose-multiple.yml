@@ -36,7 +36,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes: # preserve and persist data on my hard drive
       - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
-      - ./mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-approval-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js:ro
     container_name: mongodb-event-mul
 
 
