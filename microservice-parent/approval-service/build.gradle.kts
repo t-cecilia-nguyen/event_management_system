@@ -43,6 +43,7 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 	implementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
+	testImplementation("io.rest-assured:rest-assured:5.5.0")
 }
 
 tasks.withType<Test> {
