@@ -67,7 +67,7 @@ public class EventServiceImpl implements EventService{
 
         Long organizerId = eventRequest.organizerId();
 
-        log.info("Checking if organizer ID exists: " + organizerId);
+        //log.info("Checking if organizer ID exists: " + organizerId);
 
         if(!userClient.isUserExist(organizerId)){ throw new UserIdException(eventRequest.organizerId(), "User Id: "+eventRequest.organizerId()+ " is not recognized."); }
 
