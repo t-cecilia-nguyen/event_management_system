@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/microservice-parent" />
+            <option value="$PROJECT_DIR$/microservice-parent/approval-service" />
             <option value="$PROJECT_DIR$/microservice-parent/event-service" />
             <option value="$PROJECT_DIR$/microservice-parent/room-service" />
             <option value="$PROJECT_DIR$/microservice-parent/user-service" />
