@@ -12,9 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -34,31 +36,17 @@ public class ApprovalServiceImpl implements ApprovalService{
         log.debug("Creating a new approval for event {}", approvalRequest.eventId());
         try {
 
-//            ResponseEntity<Map> eventResponse = (ResponseEntity<Map>) eventClient.getEventById(approvalRequest.eventId());
-//
-//            if (eventResponse == null || eventResponse.getBody() == null) {
-//                log.warn("Event with ID {} does not exist", approvalRequest.eventId());
-//                return null;
-//            }
+            Approval approval = Approval.builder()
+                    .id(approvalRequest.id())
+                    .eventId(approvalRequest.eventId())
+                    .approverId(approvalRequest.approverId())
+                    .status(Approval.ApprovalStatus.PENDING)  // Set to PENDING initially
+                    .comments(approvalRequest.comments())
+                    .build();
+            approvalRepository.save(approval);
+            log.info("Approval {} is saved", approval.getId());
+            return mapToApprovalResponse(approval);
 
-            // Proceed with checking if the user is authorized to approve
-            var isStaff = userClient.checkUserType(approvalRequest.approverId());
-
-            if (Objects.equals(isStaff, "STAFF")) {
-                Approval approval = Approval.builder()
-                        .id(approvalRequest.id())
-                        .eventId(approvalRequest.eventId())
-                        .approverId(approvalRequest.approverId())
-                        .status(Approval.ApprovalStatus.PENDING)  // Set to PENDING initially
-                        .comments(approvalRequest.comments())
-                        .build();
-                approvalRepository.save(approval);
-                log.info("Approval {} is saved", approval.getId());
-                return mapToApprovalResponse(approval);
-            } else {
-                log.warn("User is not authorized to approve");
-                return null;
-            }
         } catch (FeignException | HttpClientErrorException e) {
             log.error("Error checking user type or event existence: {}", e.getMessage());
             return null;
@@ -100,23 +88,44 @@ public class ApprovalServiceImpl implements ApprovalService{
     }
 
     @Override
-    public ApprovalResponse updateApproval(String approvalId, ApprovalRequest approvalRequest) {
-        log.debug("Updating approval with id {}", approvalId);
+    public ApprovalResponse approve(String approvalId, String approverId, String comments) {
+        var isStaff = userClient.checkUserType(approverId);
 
+        if (!Objects.equals(isStaff, "STAFF")) {
+            log.warn("User {} is not authorized to approve", approverId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to approve");
+        }
+
+        return updateApprovalStatus(approvalId, Approval.ApprovalStatus.APPROVED, comments);
+    }
+
+    @Override
+    public ApprovalResponse deny(String approvalId, String approverId, String comments) {
+        var isStaff = userClient.checkUserType(approverId);
+
+        if (!Objects.equals(isStaff, "STAFF")) {
+            log.warn("User {} is not authorized to deny", approverId);
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to deny");
+        }
+
+        return updateApprovalStatus(approvalId, Approval.ApprovalStatus.DENIED, comments);
+    }
+
+    private ApprovalResponse updateApprovalStatus(String approvalId, Approval.ApprovalStatus status, String comments) {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(approvalId));
         Approval approval = mongoTemplate.findOne(query, Approval.class);
 
         if (approval != null) {
-            approval.setStatus(approvalRequest.status());  // Update status here
-            approval.setComments(approvalRequest.comments());
+            approval.setStatus(status);
+            approval.setComments(comments);
 
             Approval updatedApproval = approvalRepository.save(approval);
             return mapToApprovalResponse(updatedApproval);
+        } else {
+            log.warn("Approval with id {} not found", approvalId);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval not found");
         }
-
-        log.warn("Approval with id {} not found", approvalId);
-        return null;
     }
 
     @Override
@@ -124,4 +133,6 @@ public class ApprovalServiceImpl implements ApprovalService{
         log.debug("Deleting approval with id {}", approvalId);
         approvalRepository.deleteById(approvalId);
     }
+
+
 }

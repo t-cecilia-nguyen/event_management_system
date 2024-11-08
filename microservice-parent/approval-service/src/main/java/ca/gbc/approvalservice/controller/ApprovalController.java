@@ -44,26 +44,43 @@ public class ApprovalController {
         return approvalService.getAllApprovals();
     }
 
-    @GetMapping("/{approvalId}")
-    public ResponseEntity<ApprovalResponse> getApprovalById(@PathVariable("approvalId") String approvalId) {
-        ApprovalResponse approval = approvalService.getApprovalById(approvalId);
-        return ResponseEntity.ok(approval);
+    @GetMapping("/{id}")
+    public ResponseEntity<ApprovalResponse> getApprovalById(@PathVariable String id) {
+        ApprovalResponse approval = approvalService.getApprovalById(id);
+        return approval != null ? new ResponseEntity<>(approval, HttpStatus.OK) :
+                new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PutMapping("/{approvalId}")
-    public ResponseEntity<?> updateApproval(@PathVariable("approvalId") String approvalId,
-                                            @RequestBody ApprovalRequest approvalRequest) {
-        String updatedApprovalId = String.valueOf(approvalService.updateApproval(approvalId, approvalRequest));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Location", "/api/approval/" + updatedApprovalId);
-
-        return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
+    // Approve an approval
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<ApprovalResponse> approveApproval(
+            @PathVariable String id,
+            @RequestParam String approverId,
+            @RequestBody String comments) {
+        try {
+            ApprovalResponse response = approvalService.approve(id, approverId, comments);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
     }
 
-    @DeleteMapping("/{approvalId}")
-    public ResponseEntity<?> deleteApproval(@PathVariable("approvalId") String approvalId) {
-        approvalService.deleteApproval(approvalId);
+    @PutMapping("/{id}/deny")
+    public ResponseEntity<ApprovalResponse> denyApproval(
+            @PathVariable String id,
+            @RequestParam String approverId,
+            @RequestBody String comments) {
+        try {
+            ApprovalResponse response = approvalService.deny(id, approverId, comments);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteApproval(@PathVariable String id) {
+        approvalService.deleteApproval(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
