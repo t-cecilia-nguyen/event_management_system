@@ -2,6 +2,7 @@ package ca.gbc.approvalservice;
 
 import ca.gbc.approvalservice.stub.UserClientStub;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.HttpStatus;
 import org.testcontainers.containers.MongoDBContainer;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ApprovalServiceApplicationTests {
@@ -60,7 +63,7 @@ class ApprovalServiceApplicationTests {
 
 
         //user client stub
-        UserClientStub.stubCheckUserType(userId);
+//        UserClientStub.stubCheckUserType(userId);
 
 
         RestAssured.given()
@@ -97,83 +100,19 @@ class ApprovalServiceApplicationTests {
 
 
     @Test
-    void updateEventTest() {
-        long userId =1;
-        String eventId= "EVENT1";
+    void testDeleteApproval() {
 
-        String updateEventRequest = String.format("""
-       {
-            "eventName": "Updated Sample Event",
-            "eventType": "Conference",
-            "organizerId": %d,
-            "expectedAttendees": 44
-       }
-       """, userId);
-
-        //user client stub
-        UserClientStub.stubUserIdExistCall(userId);
-
-        UserClientStub.stubUserRoleCall(userId);
-        //--> will hardcoded returning staff
-
-        RestAssured.given()
-                .contentType("application/json")
-                .body(updateEventRequest)
-                .when()
-                .put("/api/event/" + eventId)
-                .then()
-                .log().all()
-                .statusCode(204)
-                .header("Location", "/api/event/" + eventId);
-    }
-
-    @Test
-    void deleteEventTest() {
-
-        long userId =1;
-
-        String eventRequest = String.format("""
-       {
-            "eventName": "To-be-Deleted Sample Event",
-            "eventType": "Conference",
-            "organizerId": %d,
-            "expectedAttendees": 44
-       }
-       """, userId);
-
-
-        //user client stub
-        UserClientStub.stubUserIdExistCall(userId);
-        //--> will hardcoded returning true
-
-
-        UserClientStub.stubUserRoleCall(userId);
-        //--> will hardcoded returning staff
-
-        String eventId =  RestAssured.given()
-                .contentType("application/json")
-                .body(eventRequest)
-                .when()
-                .post("/api/event")
-                .then()
-                .log().all()
-                .statusCode(201)
-                .body("id", Matchers.notNullValue())
-                .extract().path("id");
-
+        String approvalId = "123";
 
 
         RestAssured.given()
                 .when()
-                .delete("/api/event/" + eventId)
+                .delete("/api/approval/{approvalId}", approvalId)
                 .then()
                 .log().all()
                 .statusCode(204);
 
-
     }
-
-
 
 
 }

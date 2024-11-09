@@ -21,7 +21,7 @@ public class Approval {
     private String eventId;
     private String approverId;
     @Builder.Default
-    private ApprovalStatus status = ApprovalStatus.PENDING;  // Use enum and sets pending as default
+    private ApprovalStatus status = ApprovalStatus.PENDING;
     private String comments;
 
 
