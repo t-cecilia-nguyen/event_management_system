@@ -1,19 +1,16 @@
 package ca.gbc.bookingservice;
 
-import ca.gbc.bookingservice.stub.RoomClientStub;
-import com.github.tomakehurst.wiremock.WireMockServer;
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.MongoDBContainer;
-
-import java.time.LocalDateTime;
-
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import org.junit.jupiter.api.TestInfo;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,18 +24,6 @@ class BookingServiceApplicationTests {
 
 	private String bookingId;
 
-	private static WireMockServer wireMockServer = new WireMockServer(wireMockConfig().port(8080));
-
-	@BeforeAll
-	static void setupWireMockServer() {
-		wireMockServer.start();
-	}
-
-	@AfterAll
-	static void stopWireMockServer() {
-		wireMockServer.stop();
-	}
-
 	static {
 		mongoDBContainer.start();
 	}
@@ -47,9 +32,6 @@ class BookingServiceApplicationTests {
 	void setup() {
 		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = port;
-
-		RoomClientStub.roomClientCall(1L);
-
 		bookingId = createBookingSetup();
 	}
 
@@ -97,7 +79,7 @@ class BookingServiceApplicationTests {
 		String requestBody = """
 				{	
 					"userId": "user2",
-					"roomId": "1",
+					"roomId": "2",
 					"startTime": "2024-11-10T14:00:00",
 					"endTime": "2024-11-10T18:00:00",
 					"purpose": "Team Presentation"
@@ -114,7 +96,7 @@ class BookingServiceApplicationTests {
 				.statusCode(201)
 				.body("id", Matchers.notNullValue())
 				.body("userId", Matchers.equalTo("user2"))
-				.body("roomId", Matchers.equalTo(1))
+				.body("roomId", Matchers.equalTo(2))
 				.body("purpose", Matchers.equalTo("Team Presentation"));
 	}
 
