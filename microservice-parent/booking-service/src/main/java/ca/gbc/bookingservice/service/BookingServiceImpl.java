@@ -1,8 +1,10 @@
 package ca.gbc.bookingservice.service;
 
+import ca.gbc.bookingservice.client.RoomClient;
 import ca.gbc.bookingservice.dto.BookingRequest;
 import ca.gbc.bookingservice.dto.BookingResponse;
 import ca.gbc.bookingservice.exception.ConflictException;
+import ca.gbc.bookingservice.exception.RoomNotAvailableException;
 import ca.gbc.bookingservice.model.Booking;
 import ca.gbc.bookingservice.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +25,14 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final MongoTemplate mongoTemplate;
+    private final RoomClient roomClient;
 
     @Override
     public BookingResponse createBooking(BookingRequest bookingRequest) {
+
+
+        boolean isRoomAvailable = roomClient.checkRoomAvailability(bookingRequest.roomId());
+        log.info("Room attempting to be booked has the availability status of: " + isRoomAvailable);
 
         log.debug("Creating a new booking for user {}", bookingRequest.userId());
 
@@ -36,18 +43,22 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage());
         }
 
-        Booking booking = Booking.builder()
-                .userId(bookingRequest.userId())
-                .roomId(bookingRequest.roomId())
-                .startTime(bookingRequest.startTime())
-                .endTime(bookingRequest.endTime())
-                .purpose(bookingRequest.purpose())
-                .build();
+        if (isRoomAvailable) {
 
-        bookingRepository.save(booking);
-        log.info("Booking with ID {} created", booking.getId());
+            Booking booking = Booking.builder()
+                    .userId(bookingRequest.userId())
+                    .roomId(bookingRequest.roomId())
+                    .startTime(bookingRequest.startTime())
+                    .endTime(bookingRequest.endTime())
+                    .purpose(bookingRequest.purpose())
+                    .build();
 
-        return mapToBookingResponse(booking);
+            bookingRepository.save(booking);
+            log.info("Booking with ID {} created", booking.getId());
+            return mapToBookingResponse(booking);
+        } else {
+            throw new RoomNotAvailableException("Room with ID " + bookingRequest.roomId() + " is not available.");
+        }
     }
 
     @Override
@@ -84,6 +95,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public String updateBooking(String bookingId, BookingRequest bookingRequest) {
 
+        boolean isRoomAvailable = roomClient.checkRoomAvailability(bookingRequest.roomId());
+        log.info("Room attempting to be booked has the availability status of: " + isRoomAvailable);
+
         log.debug("Updating booking with id {}", bookingId);
 
         try {
@@ -96,7 +110,7 @@ public class BookingServiceImpl implements BookingService {
         Query query = new Query(Criteria.where("id").is(bookingId));
         Booking booking = mongoTemplate.findOne(query, Booking.class);
 
-        if (booking != null) {
+        if (booking != null && isRoomAvailable) {
             booking.setUserId(bookingRequest.userId());
             booking.setRoomId(bookingRequest.roomId());
             booking.setStartTime(bookingRequest.startTime());
@@ -106,8 +120,10 @@ public class BookingServiceImpl implements BookingService {
 
             log.info("Booking with id {} has been updated", bookingId);
             return bookingId;
-        } else {
+        } else if (booking == null) {
             throw new RuntimeException("Booking could not be found");
+        } else {
+            throw new RoomNotAvailableException("Room with ID " + bookingRequest.roomId() + " is not available to be updated");
         }
     }
 

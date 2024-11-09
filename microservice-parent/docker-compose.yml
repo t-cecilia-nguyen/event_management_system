@@ -108,7 +108,7 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
       - ./data/mongo/bookings:/data/db
-      - ./init/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js   # Initialize MongoDB with data from this script
+      - ./init/mongo/docker-entrypoint-initdb.d/mongo-booking-init.js:/docker-entrypoint-initdb.d/mongo-booking-init.js:ro  # Initialize MongoDB with data from this script
     container_name: booking-mongodb
     networks:
       - spring
