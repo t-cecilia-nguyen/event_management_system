@@ -228,7 +228,7 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin-event-booking
     ports:
-      - "8888:80"
+      - "8889:80"
     environment:
       - PGADMIN_DEFAULT_EMAIL=user@domain.ca
       - PGADMIN_DEFAULT_PASSWORD=password
