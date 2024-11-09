@@ -68,8 +68,6 @@ public class UserController {
         return userService.checkAllUserType(userType);
     }
 
-
-
     @GetMapping("/exist/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Boolean isUserExist(@PathVariable("id") Long id) {
