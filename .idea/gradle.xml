@@ -5,10 +5,13 @@
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/microservice-parent" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/microservice-parent" />
+            <option value="$PROJECT_DIR$/microservice-parent/approval-service" />
             <option value="$PROJECT_DIR$/microservice-parent/booking-service" />
+            <option value="$PROJECT_DIR$/microservice-parent/event-service" />
             <option value="$PROJECT_DIR$/microservice-parent/room-service" />
             <option value="$PROJECT_DIR$/microservice-parent/user-service" />
           </set>

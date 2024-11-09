@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
@@ -9,8 +10,31 @@
         </processorPath>
         <module name="microservice-parent.room-service.main" />
         <module name="microservice-parent.user-service.main" />
+        <module name="microservice-parent.event-service.main" />
         <module name="microservice-parent.booking-service.main" />
+        <module name="microservice-parent.approval-service.main" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="21">
+      <module name="booking-service" target="17" />
+      <module name="booking-service.main" target="17" />
+      <module name="booking-service.test" target="17" />
+      <module name="ca.gbc.microservice-parent.main" target="22" />
+      <module name="ca.gbc.microservice-parent.test" target="22" />
+      <module name="discovery-server" target="22" />
+      <module name="discovery-server.main" target="22" />
+      <module name="discovery-server.test" target="22" />
+      <module name="event-service" target="22" />
+      <module name="event-service.main" target="22" />
+      <module name="event-service.test" target="22" />
+      <module name="microservice-parent.discovery-server.main" target="22" />
+      <module name="microservice-parent.discovery-server.test" target="22" />
+      <module name="microservice-parent.order-service" target="22" />
+      <module name="microservice-parent.order-service.main" target="22" />
+      <module name="microservice-parent.order-service.test" target="22" />
+      <module name="microservice-parent.product-service" target="22" />
+      <module name="microservice-parent.product-service.main" target="22" />
+      <module name="microservice-parent.product-service.test" target="22" />
+    </bytecodeTargetLevel>
   </component>
 </project>

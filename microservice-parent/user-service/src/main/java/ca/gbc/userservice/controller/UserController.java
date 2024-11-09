@@ -47,28 +47,36 @@ public class UserController {
         return userService.getUserById(id);
     }
 
+
+
     @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUser(@PathVariable("id") Long id,
                            @RequestBody UserRequest userRequest) {
         userService.updateUser(id, userRequest);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
     }
 
-    @GetMapping("/role")
+    @GetMapping("/usertype")
     @ResponseStatus(HttpStatus.OK)
-    public List<User> checkAllRole(@RequestParam String role) {
-        return userService.checkAllRole(role);
+    public List<User> checkAllUserType(@RequestParam String userType) {
+        return userService.checkAllUserType(userType);
     }
 
-    @GetMapping("{id}/role")
+    @GetMapping("/exist/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String checkUserRole(@PathVariable Long id) {
-        return userService.checkUserRole(id);
+    public Boolean isUserExist(@PathVariable("id") Long id) {
+        return userService.isUserExist(id);
+    }
+
+    @GetMapping("/{id}/usertype")
+    @ResponseStatus(HttpStatus.OK)
+    public String checkUserType(@PathVariable Long id) {
+        return userService.checkUserType(id);
     }
 }

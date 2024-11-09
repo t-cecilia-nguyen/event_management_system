@@ -1,0 +1,57 @@
+version: '3.9'
+
+services:
+
+  postgres-user-mul:
+    image: postgres
+    ports:
+      - "5438:5432"
+    container_name: postgres-user-mul
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./data/user:/var/lib/postgresql/data
+      - ./postgres/init/user/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+
+
+
+  pgadmin-mul:
+    image: dpage/pgadmin4
+    ports:
+      - "8889:80"
+    container_name: pgadmin-mul
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
+      - PGADMIN_DEFAULT_PASSWORD=password
+
+
+  mongodb-event-mul:
+    image: mongo:latest
+    ports:
+      - "27018:27017"
+    environment: # read from documentation
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes: # preserve and persist data on my hard drive
+      - ./data/mongo/events:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-approval-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js:ro
+    container_name: mongodb-event-mul
+
+
+
+
+  # Our dependent service
+  mongo-express-event-mul:
+    image: mongo-express
+    ports:
+      - "8082:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONG0DB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-mul:27017/
+
+    container_name: mongo-express-event-mul
+    depends_on:
+      - mongodb-event-mul

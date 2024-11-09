@@ -9,27 +9,15 @@ version: '3.9'
 
 services:
 
-  user-service:
-    image: user-service
-    container_name: user-service
-    ports:
-      - "8085:8085"
-    build:
-      context: ./user-service
-      dockerfile: ./Dockerfile
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      #SPRING_DATASOURCE_URL: jdbc:postgresql://user-postgres:5433/user-service
-    depends_on:
-      - user-postgres
-    networks:
-      - spring
+  ###########################
+  # ROOM SERVICE CONTAINERS #
+  ###########################
 
   room-service:
     image: room-service
     container_name: room-service
     ports:
-      - "8084:8084"
+      - "8095:8095"
     build:
       context: ./room-service
       dockerfile: ./Dockerfile
@@ -40,26 +28,11 @@ services:
     networks:
       - spring
 
-  user-postgres:
-    image: postgres:latest
-    container_name: user-postgres
-    ports:
-      - "5439:5432"
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
-    volumes:
-      - ./data/postgres/users:/var/lib/postgresql/data
-      - ./local-docker-file/postgres/init/user/init.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - spring
-    restart: unless-stopped
-
   room-postgres:
     image: postgres:latest
     container_name: room-postgres
     ports:
-      - "5432:5432"
+      - "5439:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
@@ -70,17 +43,9 @@ services:
       - spring
     restart: unless-stopped
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin-event-booking
-    ports:
-      - "8888:80"
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
-      - PGADMIN_DEFAULT_PASSWORD=password
-    networks:
-      - spring
-    restart: unless-stopped
+  ##############################
+  # BOOKING SERVICE CONTAINERS #
+  ##############################
 
   booking-service:
     image: booking-service
@@ -96,8 +61,6 @@ services:
       - booking-mongodb
     networks:
       - spring
-
-  # BOOKING SERVICE CONTAINERS
 
   booking-mongodb:
     image: mongo:latest
@@ -127,7 +90,156 @@ services:
     networks:
       - spring
 
-# Optional volumes section for persisting data
+  ###########################
+  # USER SERVICE CONTAINERS #
+  ###########################
+
+  user-service:
+    image: user-service
+    container_name: user-service
+    ports:
+      - "8097:8097"
+    build:
+      context: ./user-service
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - user-postgres
+    networks:
+      - spring
+
+  user-postgres:
+    image: postgres:latest
+    container_name: user-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./data/postgres/users:/var/lib/postgresql/data
+      - ./local-docker-file/postgres/init/user/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - spring
+    restart: unless-stopped
+
+  ############################
+  # EVENT SERVICE CONTAINERS #
+  ############################
+
+  event-service:
+    image: event-service
+    ports:
+      - "8098:8098"
+    build:
+      context: ./event-service
+      dockerfile: ./Dockerfile
+    container_name: event-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - mongodb-event-service
+    networks:
+      - spring
+
+  mongodb-event-service:
+    image: mongo:latest
+    ports:
+      - "27019:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./data/mongo/events:/data/db
+      - ./local-docker-file/mongo/init/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    container_name: mongodb-event-service
+    networks:
+      - spring
+
+  mongo-express-event:
+    image: mongo-express
+    ports:
+      - "8083:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_URL: mongodb://admin:password@mongodb-event-service:27017
+    container_name: mongo-express-event-service
+    depends_on:
+      - mongodb-event-service
+    networks:
+      - spring
+
+  ###############################
+  # APPROVAL SERVICE CONTAINERS #
+  ###############################
+
+  approval-service:
+    image: approval-service
+    container_name: approval-service
+    ports:
+      - "8087:8087" # Map to the desired port for the approval service
+    build:
+      context: ./approval-service
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - approval-mongo
+      - user-service # Add user-service dependency if needed
+    networks:
+      - spring
+
+  approval-mongo:
+    image: mongo:latest
+    container_name: approval-mongo
+    ports:
+      - "27020:27017"
+    volumes:
+      - ./data/mongo/approvals:/data/db   # localhost-hard-drive:virtual-logical-drive( virtual inside containerize environment)
+      - ./mongo/init/docker-entrypoint-initdb.d/mongo-approval-init.js:/docker-entrypoint-initdb.d/mongo-approval-init.js:ro
+    networks:
+      - spring
+    environment: # read from documentation
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    restart: unless-stopped
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    ports:
+      - "8091:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=approval-mongo
+      - ME_CONFIG_MONGODB_PORT=27020
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=password
+    networks:
+      - spring
+    restart: unless-stopped
+
+  ###########
+  # PGADMIN #
+  ###########
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-event-booking
+    ports:
+      - "8889:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=user@domain.ca
+      - PGADMIN_DEFAULT_PASSWORD=password
+    networks:
+      - spring
+    restart: unless-stopped
+
+  ####################
+  # VOLUMES SECTION #
+  ###################
+
 volumes:
   mongo-db:
     driver: local
@@ -135,3 +247,4 @@ volumes:
 networks:
   spring:
     driver: bridge
+

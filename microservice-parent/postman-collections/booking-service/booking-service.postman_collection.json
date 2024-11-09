@@ -1,0 +1,191 @@
+{
+	"info": {
+		"_postman_id": "13105b1a-b63e-4e45-b4da-5a57a30e0735",
+		"name": "booking-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38405366"
+	},
+	"item": [
+		{
+			"name": "Create Booking",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"user2\",\r\n    \"roomId\": \"1\",\r\n    \"startTime\": \"2024-11-10T14:00:00\",\r\n    \"endTime\": \"2024-11-10T20:00:00\",\r\n    \"purpose\": \"Team Meeting\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Conflict Check",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"user2\",\r\n    \"roomId\": \"1\",\r\n    \"startTime\": \"2024-11-10T19:00:00\",\r\n    \"endTime\": \"2024-11-10T21:00:00\",\r\n    \"purpose\": \"Team Presentation\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Bookings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8086/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Booking by Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8086/bookings/672eec15f1ac672b8acada2b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings",
+						"672eec15f1ac672b8acada2b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Booking",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"user2\",\r\n    \"roomId\": \"1\",\r\n    \"startTime\": \"2024-11-10T20:00:00\",\r\n    \"endTime\": \"2024-11-10T21:00:00\",\r\n    \"purpose\": \"Team Presentation\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/bookings/672eec15f1ac672b8acada2b",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings",
+						"672eec15f1ac672b8acada2b"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Booking",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/bookings/672eec75f1ac672b8acada2d",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings",
+						"672eec75f1ac672b8acada2d"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Booking with Unavailable Room",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": \"user2\",\r\n    \"roomId\": \"2\",\r\n    \"startTime\": \"2024-11-10T14:00:00\",\r\n    \"endTime\": \"2024-11-10T20:00:00\",\r\n    \"purpose\": \"Team Meeting\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8086/bookings",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8086",
+					"path": [
+						"bookings"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
