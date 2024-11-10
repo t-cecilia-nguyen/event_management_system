@@ -1,0 +1,108 @@
+{
+	"info": {
+		"_postman_id": "e54e2ddc-6b93-4d08-931e-041dc6bf8241",
+		"name": "event-service-",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "38620266"
+	},
+	"item": [
+		{
+			"name": "get all events",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:8093/api/event"
+			},
+			"response": []
+		},
+		{
+			"name": "Create a new event",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Test Event 2\",\r\n    \"eventType\": \"Conference\",\r\n    \"organizerId\": 3,\r\n    \"expectedAttendees\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8093/api/event"
+			},
+			"response": []
+		},
+		{
+			"name": "Create fail due to userRole Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Music Concert\",\r\n    \"eventType\": \"Concert\",\r\n    \"organizerId\": 3,\r\n    \"expectedAttendees\": 1200\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8098/api/event"
+			},
+			"response": []
+		},
+		{
+			"name": "Create fail due to userId Copy",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Music Concert\",\r\n    \"eventType\": \"Concert\",\r\n    \"organizerId\": 1111,\r\n    \"expectedAttendees\": 100\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8098/api/event"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete an event",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:8093/api/event/672a31c84e7b132fc056dbb5"
+			},
+			"response": []
+		},
+		{
+			"name": "Update an event",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"eventName\": \"Test Event\",\r\n    \"eventType\": \"Conference\",\r\n    \"organizerId\": 2,\r\n    \"expectedAttendees\": 30000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:8093/api/event/672a669ae9a33c577ed1188b"
+			},
+			"response": []
+		},
+		{
+			"name": "Get an event by Id Copy",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
