@@ -54,40 +54,6 @@ public class ApprovalServiceImpl implements ApprovalService{
     }
 
     @Override
-    public List<ApprovalResponse> getAllApprovals() {
-        log.debug("Returning a list of approvals");
-
-        List<Approval> approvals = approvalRepository.findAll();
-        return approvals.stream().map(this::mapToApprovalResponse).toList();
-    }
-
-    private ApprovalResponse mapToApprovalResponse(Approval approval) {
-        return new ApprovalResponse(
-                approval.getId(),
-                approval.getEventId(),
-                approval.getApproverId(),
-                approval.getStatus(),
-                approval.getComments()
-        );
-    }
-
-    @Override
-    public ApprovalResponse getApprovalById(String approvalId) {
-        log.debug("Fetching approval with id {}", approvalId);
-
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(approvalId));
-        Approval approval = mongoTemplate.findOne(query, Approval.class); // Finds approval by ID
-
-        if (approval != null) {
-            return mapToApprovalResponse(approval);
-        }
-
-        log.warn("Approval with id {} not found", approvalId);
-        return null;
-    }
-
-    @Override
     public ApprovalResponse approve(String approvalId, String approverId, String comments) {
         var isStaff = userClient.checkUserType(approverId);
 
@@ -126,6 +92,40 @@ public class ApprovalServiceImpl implements ApprovalService{
             log.warn("Approval with id {} not found", approvalId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Approval not found");
         }
+    }
+
+    @Override
+    public List<ApprovalResponse> getAllApprovals() {
+        log.debug("Returning a list of approvals");
+
+        List<Approval> approvals = approvalRepository.findAll();
+        return approvals.stream().map(this::mapToApprovalResponse).toList();
+    }
+
+    private ApprovalResponse mapToApprovalResponse(Approval approval) {
+        return new ApprovalResponse(
+                approval.getId(),
+                approval.getEventId(),
+                approval.getApproverId(),
+                approval.getStatus(),
+                approval.getComments()
+        );
+    }
+
+    @Override
+    public ApprovalResponse getApprovalById(String approvalId) {
+        log.debug("Fetching approval with id {}", approvalId);
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("id").is(approvalId));
+        Approval approval = mongoTemplate.findOne(query, Approval.class); // Finds approval by ID
+
+        if (approval != null) {
+            return mapToApprovalResponse(approval);
+        }
+
+        log.warn("Approval with id {} not found", approvalId);
+        return null;
     }
 
     @Override
