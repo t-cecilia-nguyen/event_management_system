@@ -4,7 +4,7 @@
 
 # Start from the Gradle 8 image file with JDK 22. This image provides both Gradle and JDK 22.
 # We use this stage to build the application within the container.
-FROM gradle:8-jdk21 AS builder
+FROM gradle:8-jdk22 AS builder
 
 # Copy the application file from the host machine to the image filesystem.
 # We use the --chown=gradle:gradle flag to ensure proper file permissions for the Gradle user
@@ -25,7 +25,7 @@ RUN gradle build -x test
 
 # Start from a lightweight OpenJDK 22 Alpine image. This will be our runtime image.
 # Alphine images are much smaller, which helps keep the final image size down.
-FROM openjdk:21-jdk
+FROM openjdk:22-jdk
 
 # Create a directory inside the container where the application will be stored.
 # This directory is where we will place the package .jar gile built in the previous stage.

@@ -9,7 +9,7 @@ version = "0.0.1-SNAPSHOT"
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(22)
 	}
 }
 
@@ -30,6 +30,8 @@ dependencyManagement{
 }
 
 dependencies {
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+	testImplementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.6.0")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 	implementation("org.springframework.boot:spring-boot-starter-web")
