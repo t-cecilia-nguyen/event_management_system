@@ -6,20 +6,17 @@ import ca.gbc.approvalservice.dto.ApprovalRequest;
 import ca.gbc.approvalservice.dto.ApprovalResponse;
 import ca.gbc.approvalservice.model.Approval;
 import ca.gbc.approvalservice.repository.ApprovalRepository;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -34,8 +31,8 @@ public class ApprovalServiceImpl implements ApprovalService{
     @Override
     public ApprovalResponse createApproval(ApprovalRequest approvalRequest) {
         log.debug("Creating a new approval for event {}", approvalRequest.eventId());
-        try {
 
+        try {
             Approval approval = Approval.builder()
                     .id(approvalRequest.id())
                     .eventId(approvalRequest.eventId())
@@ -47,7 +44,7 @@ public class ApprovalServiceImpl implements ApprovalService{
             log.info("Approval {} is saved", approval.getId());
             return mapToApprovalResponse(approval);
 
-        } catch (FeignException | HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
             log.error("Error checking user type or event existence: {}", e.getMessage());
             return null;
         }

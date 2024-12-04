@@ -1,5 +1,6 @@
 package ca.gbc.bookingservice.service;
 
+
 import ca.gbc.bookingservice.client.RoomClient;
 import ca.gbc.bookingservice.dto.BookingRequest;
 import ca.gbc.bookingservice.dto.BookingResponse;
@@ -29,7 +30,6 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingResponse createBooking(BookingRequest bookingRequest) {
-
 
         boolean isRoomAvailable = roomClient.checkRoomAvailability(bookingRequest.roomId());
         log.info("Room attempting to be booked has the availability status of: " + isRoomAvailable);

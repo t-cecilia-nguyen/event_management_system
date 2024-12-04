@@ -22,7 +22,7 @@ public class OpenAPIConfig {
                         .license(new License().name("Apache 2.0"))
                 )
                 .externalDocs(new ExternalDocumentation()
-                        .description("Room Service Wiki Doccummentation")
+                        .description("Room Service Wiki Documentation")
                         .url("https://mycompany.com/room-service/docs")
                 );
     }

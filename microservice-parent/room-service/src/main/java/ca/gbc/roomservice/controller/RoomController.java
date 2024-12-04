@@ -44,6 +44,14 @@ public class RoomController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<RoomResponse> getAllRooms() {
+
+//        // To simulate time-out
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e){
+//            throw new RuntimeException(e);
+//        }
+//
         return roomService.getAllRooms();
     }
 

@@ -16,15 +16,14 @@ public class SecurityConfig {
 
     private final String[] noauthResourceUris = {
             "/swagger-ui",
-            "/swagger-ui/*",
+//            "/swagger-ui/*",
             "/swagger-ui/**",
-            "/swagger-resources/**",
+            "/swagger-resource/**",
             "/v3/api-docs/**",
             "/api-docs/**",
-            "/aggregate/**",
-            "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"
+            "/aggregate/**"
+//            "/v3/api-docs/**", "/swagger-ui.html"
     };
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
