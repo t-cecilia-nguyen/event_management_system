@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,12 +54,11 @@ public class ApprovalController {
     }
 
     // Approve an approval
-    @PutMapping("/{id}/approve")
+    @PutMapping("/approve")
     public ResponseEntity<ApprovalResponse> approveApproval(
-            @PathVariable String id,
             @RequestBody ApprovalRequest approvalRequest) {
         try {
-            ApprovalResponse response = approvalService.approve(id, approvalRequest.approverId(), approvalRequest.comments());
+            ApprovalResponse response = approvalService.approve(approvalRequest.id(), approvalRequest.approverId(), approvalRequest.comments());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (ResponseStatusException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -67,12 +67,12 @@ public class ApprovalController {
         }
     }
 
-    @PutMapping("/{id}/deny")
+    @PutMapping("/deny")
     public ResponseEntity<ApprovalResponse> denyApproval(
-            @PathVariable String id,
+//            @PathVariable String id,
             @RequestBody ApprovalRequest approvalRequest) {
         try {
-            ApprovalResponse response = approvalService.deny(id, approvalRequest.approverId(), approvalRequest.comments());
+            ApprovalResponse response = approvalService.deny(approvalRequest.id(), approvalRequest.approverId(), approvalRequest.comments());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (ResponseStatusException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);

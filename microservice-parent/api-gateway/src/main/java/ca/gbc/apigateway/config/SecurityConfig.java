@@ -12,11 +12,13 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
+//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
+//@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize support
 public class SecurityConfig {
 
     private final String[] noauthResourceUris = {
@@ -33,8 +35,6 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
-
         log.info("Initializing Security Filter Chain...");
 
         return httpSecurity
@@ -43,17 +43,15 @@ public class SecurityConfig {
                         .requestMatchers(noauthResourceUris).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> jwt.decoder(jwtDecoder()))  // Use custom JWT decoder
+                        .jwt(jwt -> jwt.decoder(keycloakJwtDecoder()))  // Use custom KeycloakJwtDecoder
                 )
                 .build();
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder keycloakJwtDecoder() {
         String jwkSetUri = "http://keycloak:8080/realms/booking-event-security-realm/protocol/openid-connect/certs";
-        String issuerUri = "http://keycloak:8080/realms/booking-event-security-realm";  // Set the correct issuer URI
-        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
-        jwtDecoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuerUri));
-        return jwtDecoder;
+        String issuerUri = "http://keycloak:8080/realms/booking-event-security-realm";
+        return new KeycloakJwtDecoder(jwkSetUri, issuerUri);
     }
 }
