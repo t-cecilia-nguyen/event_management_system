@@ -3,6 +3,7 @@ package ca.gbc.eventservice.service;
 import ca.gbc.eventservice.client.UserClient;
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.event.BookingPlacedEvent;
 import ca.gbc.eventservice.exception.UserIdException;
 import ca.gbc.eventservice.exception.UserRoleException;
 import ca.gbc.eventservice.model.Event;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -166,5 +168,19 @@ public class EventServiceImpl implements EventService{
         return mapToEventResponse(event);
     }
 
+    // Kafka listener for BookingPlacedEvent
+    @KafkaListener(topics = "booking-placed-event")
+    public void listenBookingEvent(BookingPlacedEvent bookingPlacedEvent) {
+
+        log.info("Received BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId());
+
+        try {
+            // ADD EVENT CREATE LOGIC HERE
+
+            log.info("Event for Booking ID {} has been saved successfully.", bookingPlacedEvent.getBookingId());
+        } catch (Exception e) {
+            log.error("An error occurred while processing BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId());
+        }
+    }
 
 }
