@@ -1,5 +1,6 @@
 package ca.gbc.apigateway.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class KeycloakJwtDecoder implements JwtDecoder {
 
     private final NimbusJwtDecoder delegate;
@@ -21,6 +23,7 @@ public class KeycloakJwtDecoder implements JwtDecoder {
 
     @Override
     public Jwt decode(String token) {
+        log.info("Decoding JWT token: {}", token);
         Jwt jwt = delegate.decode(token);
         List<SimpleGrantedAuthority> authorities = extractAuthorities(jwt);
 
@@ -36,7 +39,7 @@ public class KeycloakJwtDecoder implements JwtDecoder {
     private List<SimpleGrantedAuthority> extractAuthorities(Jwt jwt) {
         Map<String, Object> realmAccess = (Map<String, Object>) jwt.getClaims().get("realm_access");
         List<String> roles = (List<String>) realmAccess.get("roles");
-
+        log.info("Roles extracted from JWT: {}", roles);
         if (roles == null) {
             return List.of();
         }

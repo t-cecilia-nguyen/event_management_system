@@ -41,6 +41,7 @@ public class ApprovalController {
     }
 
     @GetMapping
+//    @PreAuthorize("permitAll()")
     @ResponseStatus(HttpStatus.OK)
     public List<ApprovalResponse> getAllApprovals() {
         return approvalService.getAllApprovals();
@@ -55,6 +56,7 @@ public class ApprovalController {
 
     // Approve an approval
     @PutMapping("/approve")
+//    @PreAuthorize("hasRole('ROLE_staff')")
     public ResponseEntity<ApprovalResponse> approveApproval(
             @RequestBody ApprovalRequest approvalRequest) {
         try {
@@ -68,6 +70,7 @@ public class ApprovalController {
     }
 
     @PutMapping("/deny")
+//    @PreAuthorize("hasRole('ROLE_staff')")
     public ResponseEntity<ApprovalResponse> denyApproval(
 //            @PathVariable String id,
             @RequestBody ApprovalRequest approvalRequest) {

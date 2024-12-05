@@ -12,13 +12,13 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
-//import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize support
+@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize support
 public class SecurityConfig {
 
     private final String[] noauthResourceUris = {
