@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -55,26 +56,28 @@ public class ApprovalController {
     @PutMapping("/{id}/approve")
     public ResponseEntity<ApprovalResponse> approveApproval(
             @PathVariable String id,
-            @RequestParam String approverId,
-            @RequestBody String comments) {
+            @RequestBody ApprovalRequest approvalRequest) {
         try {
-            ApprovalResponse response = approvalService.approve(id, approverId, comments);
+            ApprovalResponse response = approvalService.approve(id, approvalRequest.approverId(), approvalRequest.comments());
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (ResponseStatusException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/{id}/deny")
     public ResponseEntity<ApprovalResponse> denyApproval(
             @PathVariable String id,
-            @RequestParam String approverId,
-            @RequestBody String comments) {
+            @RequestBody ApprovalRequest approvalRequest) {
         try {
-            ApprovalResponse response = approvalService.deny(id, approverId, comments);
+            ApprovalResponse response = approvalService.deny(id, approvalRequest.approverId(), approvalRequest.comments());
             return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (Exception e) {
+        } catch (ResponseStatusException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
