@@ -11,6 +11,7 @@
         <module name="microservice-parent.room-service.main" />
         <module name="microservice-parent.user-service.main" />
         <module name="microservice-parent.event-service.main" />
+        <module name="microservice-parent.api-gateway.main" />
         <module name="microservice-parent.booking-service.main" />
         <module name="microservice-parent.approval-service.main" />
       </profile>
