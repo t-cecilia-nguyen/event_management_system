@@ -167,9 +167,8 @@ public class Routes {
     @Bean
     public RouterFunction<ServerResponse> fallbackRoute() {
         return route("fallbackRoute")
-                .route(RequestPredicates.all(),
-                        request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
-                                .body("Service is temporarily Unavailable, please try again later"))
+                .route(RequestPredicates.path("/fallbackRoute"), request->ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("Service is Temporarily unavailable, please try again later"))
                 .build();
     }
 }
