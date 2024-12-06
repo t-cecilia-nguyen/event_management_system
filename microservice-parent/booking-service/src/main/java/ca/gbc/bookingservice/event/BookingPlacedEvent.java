@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class BookingPlacedEvent {
 
+
     private String bookingId;
     private String userId;
     private Long roomId;

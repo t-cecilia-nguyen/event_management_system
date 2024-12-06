@@ -1,11 +1,14 @@
 package ca.gbc.eventservice.model;
 
+import ca.gbc.eventservice.dto.EventRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 @Document(value="events")
 @Data
@@ -21,4 +24,5 @@ public class Event {
 
     private Long organizerId;
     private Integer expectedAttendees;
+
 }

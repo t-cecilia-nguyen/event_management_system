@@ -63,11 +63,15 @@ public class EventServiceImpl implements EventService{
     }
 
     @Override
-    public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException, UserIdException {
+    @KafkaListener(topics = "booking-placed-event")
+    public EventResponse createEvent( EventRequest eventRequest, BookingPlacedEvent bookingPlacedEvent) throws UserRoleException, UserIdException {
+
+        log.info("Received booking-placed-event: {}", bookingPlacedEvent);
+
 
         //check organizerId
 
-        Long organizerId = eventRequest.organizerId();
+        Long organizerId = Long.valueOf(bookingPlacedEvent.getUserId());
 
         //log.info("Checking if organizer ID exists: " + organizerId);
 
@@ -80,13 +84,15 @@ public class EventServiceImpl implements EventService{
         Event event = Event.builder()
                 .eventName(eventRequest.eventName())
                 .eventType(eventRequest.eventType())
-                .organizerId(eventRequest.organizerId())
+                //userId from booking parsed to organizerId
+                .organizerId(Long.valueOf(bookingPlacedEvent.getUserId()))
                 .expectedAttendees(eventRequest.expectedAttendees())
                 .build();
 
         eventRepository.save(event);
         log.info("New Event {} is saved", eventRequest.eventName());
 
+        //
 
         return new EventResponse(
                 event.getId(),

@@ -3,6 +3,7 @@ package ca.gbc.eventservice.controller;
 
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.event.BookingPlacedEvent;
 import ca.gbc.eventservice.exception.UserIdException;
 import ca.gbc.eventservice.exception.UserRoleException;
 import ca.gbc.eventservice.model.UserIdErrorResponse;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -25,12 +27,13 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    public ResponseEntity<?> createEvent( @RequestBody EventRequest eventRequest) {
+    @KafkaListener(topics = "booking-placed-event")
+    public ResponseEntity<?> createEvent( @RequestBody EventRequest eventRequest,  BookingPlacedEvent bookingPlacedEvent) {
 
 
         try {
             System.out.println("Creating event with request: " + eventRequest);
-            EventResponse eventResponse = eventService.createEvent(eventRequest);
+            EventResponse eventResponse = eventService.createEvent(eventRequest, bookingPlacedEvent);
             System.out.println("Event created successfully with ID: " + eventResponse.id());
 
 
