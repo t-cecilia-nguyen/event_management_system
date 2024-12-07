@@ -313,7 +313,7 @@ services:
       - spring
 
   broker:
-    container_name: broker
+    container_name: broker-a2
     image: confluentinc/cp-kafka:7.5.0
     ports:
       - "9092:9092"
