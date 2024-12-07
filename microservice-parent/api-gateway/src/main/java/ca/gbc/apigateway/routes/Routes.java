@@ -42,7 +42,7 @@ public class Routes {
         log.info("Initializing approval-service route with URL: {}", approvalServiceUrl);
 
         return route("approval_service")
-                .route(RequestPredicates.path("/api/approval"), request -> {
+                .route(RequestPredicates.path("/api/approval/**"), request -> {
                     log.info("Received request for approval-service: {}", request.uri());
                     return HandlerFunctions.http(approvalServiceUrl).handle(request);
                 })
