@@ -7,11 +7,17 @@ import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctio
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.function.RequestPredicates;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.ServerRequest;
 import org.springframework.web.servlet.function.ServerResponse;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.net.URI;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.cloud.gateway.server.mvc.filter.FilterFunctions.setPath;
 
@@ -34,6 +40,8 @@ public class Routes {
     @Value("${services.user-url}")
     private String userServiceUrl;
 
+
+
     @Bean
     public RouterFunction<ServerResponse> approvalServiceRoute() {
         log.info("Initializing approval-service route with URL: {}", approvalServiceUrl);
@@ -43,11 +51,12 @@ public class Routes {
                     log.info("Received request for approval-service: {}", request.uri());
 
                     try {
+                        // Forward the request to the approval service
                         ServerResponse response = HandlerFunctions.http(approvalServiceUrl).handle(request);
-                        log.info("Response status: {}", response.statusCode());
+                        log.info("Response status from approval-service: {}", response.statusCode());
                         return response;
                     } catch (Exception e) {
-                        log.error("Error occurred while routing to: {}", e.getMessage(), e);
+                        log.error("Error occurred while routing to approval-service: {}", e.getMessage(), e);
                         return ServerResponse.status(500).body("Error occurred when routing to approval-service");
                     }
                 })
@@ -237,4 +246,7 @@ public class Routes {
                 //        .circuitBreaker("userServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
                 .build();
     }
+
+
+
 }

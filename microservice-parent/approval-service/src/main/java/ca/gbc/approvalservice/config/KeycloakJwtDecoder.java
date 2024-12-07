@@ -1,9 +1,9 @@
-package ca.gbc.apigateway.config;
+package ca.gbc.approvalservice.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
@@ -57,7 +57,7 @@ public class KeycloakJwtDecoder implements JwtDecoder {
 
         List<String> roles = (List<String>) realmAccess.get("roles");
         if (roles == null) {
-            return List.of();
+            return List.of(); // No roles found
         }
 
         // Convert roles to GrantedAuthorities with "ROLE_" prefix
