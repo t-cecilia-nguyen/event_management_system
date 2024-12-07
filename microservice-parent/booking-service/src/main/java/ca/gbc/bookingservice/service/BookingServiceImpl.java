@@ -32,9 +32,6 @@ public class BookingServiceImpl implements BookingService {
     private final RoomClient roomClient;
     private final KafkaTemplate<String, BookingPlacedEvent> kafkaTemplate;
 
-    @Value("${kafka.topic.booking-placed}")
-    private String topic;
-
     @Override
     public BookingResponse createBooking(BookingRequest bookingRequest) {
 
