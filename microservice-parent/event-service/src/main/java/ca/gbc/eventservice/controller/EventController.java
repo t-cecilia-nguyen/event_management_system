@@ -27,13 +27,12 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    @KafkaListener(topics = "booking-placed-event")
-    public ResponseEntity<?> createEvent( @RequestBody EventRequest eventRequest,  BookingPlacedEvent bookingPlacedEvent) {
+    public ResponseEntity<?> createEvent( @RequestBody EventRequest eventRequest) {
 
 
         try {
             System.out.println("Creating event with request: " + eventRequest);
-            EventResponse eventResponse = eventService.createEvent(eventRequest, bookingPlacedEvent);
+            EventResponse eventResponse = eventService.createEvent(eventRequest);
             System.out.println("Event created successfully with ID: " + eventResponse.id());
 
 
