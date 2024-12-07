@@ -49,6 +49,7 @@ public class RoomServiceImpl implements RoomService {
                 room.getFeatures(),
                 room.isAvailability());
     }
+
     @Override
     public List<RoomResponse> getAllRooms() {
         List<Room> rooms = roomRepository.findAll();
@@ -105,4 +106,6 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return room.isAvailability();
     }
+
+
 }

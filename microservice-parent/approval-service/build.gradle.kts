@@ -52,6 +52,12 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 	testImplementation("io.rest-assured:rest-assured:5.5.0")
+
+//	implementation("org.springframework.boot:spring-boot-starter-security")
+//	implementation("org.springframework.security:spring-security-oauth2-jose")
+//	implementation("org.springframework.boot:spring-boot-starter-aop")
+//	implementation("org.springframework.security:spring-security-config")
+
 }
 
 tasks.withType<Test> {

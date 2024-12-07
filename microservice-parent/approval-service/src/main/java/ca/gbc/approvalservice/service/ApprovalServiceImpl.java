@@ -52,24 +52,24 @@ public class ApprovalServiceImpl implements ApprovalService{
 
     @Override
     public ApprovalResponse approve(String approvalId, String approverId, String comments) {
-        var isStaff = userClient.checkUserType(approverId);
-
-        if (!Objects.equals(isStaff, "STAFF")) {
-            log.warn("User {} is not authorized to approve", approverId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to approve");
-        }
+//        var isStaff = userClient.checkUserType(approverId);
+//
+//        if (!Objects.equals(isStaff, "STAFF")) {
+//            log.warn("User {} is not authorized to approve", approverId);
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to approve");
+//        }
 
         return updateApprovalStatus(approvalId, Approval.ApprovalStatus.APPROVED, comments);
     }
 
     @Override
     public ApprovalResponse deny(String approvalId, String approverId, String comments) {
-        var isStaff = userClient.checkUserType(approverId);
-
-        if (!Objects.equals(isStaff, "STAFF")) {
-            log.warn("User {} is not authorized to deny", approverId);
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to deny");
-        }
+//        var isStaff = userClient.checkUserType(approverId);
+//
+//        if (!Objects.equals(isStaff, "STAFF")) {
+//            log.warn("User {} is not authorized to deny", approverId);
+//            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized to deny");
+//        }
 
         return updateApprovalStatus(approvalId, Approval.ApprovalStatus.DENIED, comments);
     }
