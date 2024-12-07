@@ -47,7 +47,7 @@ public class Routes {
                     return HandlerFunctions.http(approvalServiceUrl).handle(request);
                 })
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("approvalServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("approvalServiceCircuitBreaker", URI.create("forward:/approvalFallback")))
                 .build();
     }
 
@@ -61,7 +61,7 @@ public class Routes {
                     return HandlerFunctions.http(bookingServiceUrl).handle(request);
                 })
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("bookingServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("bookingServiceCircuitBreaker", URI.create("forward:/bookingFallback")))
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class Routes {
                     return HandlerFunctions.http(eventServiceUrl).handle(request);
                 })
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("eventServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("eventServiceCircuitBreaker", URI.create("forward:/eventFallback")))
                 .build();
     }
 
@@ -89,7 +89,7 @@ public class Routes {
                     return HandlerFunctions.http(roomServiceUrl).handle(request);
                 })
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("roomServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("roomServiceCircuitBreaker", URI.create("forward:/roomFallback")))
                 .build();
     }
 
@@ -103,7 +103,7 @@ public class Routes {
                     return HandlerFunctions.http(userServiceUrl).handle(request);
                 })
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("userServiceCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("userServiceCircuitBreaker", URI.create("forward:/userFallback")))
                 .build();
     }
 
@@ -115,7 +115,7 @@ public class Routes {
                         HandlerFunctions.http(approvalServiceUrl))
                 .filter(setPath("/api-docs"))
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("approvalSwaggerCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("approvalSwaggerCircuitBreaker", URI.create("forward:/approvalFallback")))
                 .build();
     }
 
@@ -127,7 +127,7 @@ public class Routes {
                         HandlerFunctions.http(bookingServiceUrl))
                 .filter(setPath("/api-docs"))
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("bookingSwaggerCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("bookingSwaggerCircuitBreaker", URI.create("forward:/bookingFallback")))
                 .build();
     }
     @Bean
@@ -138,7 +138,7 @@ public class Routes {
                         HandlerFunctions.http(userServiceUrl))
                 .filter(setPath("/api-docs"))
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("userSwaggerCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("userSwaggerCircuitBreaker", URI.create("forward:/userFallback")))
                 .build();
     }
     @Bean
@@ -149,7 +149,7 @@ public class Routes {
                         HandlerFunctions.http(eventServiceUrl))
                 .filter(setPath("/api-docs"))
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("eventSwaggerCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("eventSwaggerCircuitBreaker", URI.create("forward:/eventFallback")))
                 .build();
     }
     @Bean
@@ -160,7 +160,7 @@ public class Routes {
                         HandlerFunctions.http(roomServiceUrl))
                 .filter(setPath("/api-docs"))
                 .filter(CircuitBreakerFilterFunctions
-                        .circuitBreaker("roomSwaggerCircuitBreaker", URI.create("forward:/fallbackRoute")))
+                        .circuitBreaker("roomSwaggerCircuitBreaker", URI.create("forward:/roomFallback")))
                 .build();
     }
 
@@ -171,4 +171,46 @@ public class Routes {
                         .body("Service is Temporarily unavailable, please try again later"))
                 .build();
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> approvalServiceFallback() {
+        return route("approval_fallback")
+                .route(RequestPredicates.path("/approvalFallback"), request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                            .body("Approval Service is temporarily unavailable, please try again later"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> bookingServiceFallback() {
+        return route("booking_fallback")
+                .route(RequestPredicates.path("/bookingFallback"), request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("Booking Service is temporarily unavailable, please try again later"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> eventServiceFallback() {
+        return route("event_fallback")
+                .route(RequestPredicates.path("/eventFallback"), request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("Event Service is temporarily unavailable, please try again later"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> roomServiceFallback() {
+        return route("room_fallback")
+                .route(RequestPredicates.path("/roomFallback"), request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("Room Service is temporarily unavailable, please try again later"))
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> userServiceFallback() {
+        return route("user_fallback")
+                .route(RequestPredicates.path("/userFallback"), request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body("User Service is temporarily unavailable, please try again later"))
+                .build();
+    }
+
+
 }
