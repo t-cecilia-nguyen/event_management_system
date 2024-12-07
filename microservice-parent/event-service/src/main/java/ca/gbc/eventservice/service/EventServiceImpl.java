@@ -62,16 +62,13 @@ public class EventServiceImpl implements EventService{
         }
     }
 
+
     @Override
-    @KafkaListener(topics = "booking-placed-event")
-    public EventResponse createEvent( EventRequest eventRequest, BookingPlacedEvent bookingPlacedEvent) throws UserRoleException, UserIdException {
-
-        log.info("Received booking-placed-event: {}", bookingPlacedEvent);
-
+    public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException, UserIdException {
 
         //check organizerId
 
-        Long organizerId = Long.valueOf(bookingPlacedEvent.getUserId());
+        Long organizerId = Long.valueOf(eventRequest.organizerId());
 
         //log.info("Checking if organizer ID exists: " + organizerId);
 
@@ -85,12 +82,12 @@ public class EventServiceImpl implements EventService{
                 .eventName(eventRequest.eventName())
                 .eventType(eventRequest.eventType())
                 //userId from booking parsed to organizerId
-                .organizerId(Long.valueOf(bookingPlacedEvent.getUserId()))
+                .organizerId(eventRequest.organizerId())
                 .expectedAttendees(eventRequest.expectedAttendees())
                 .build();
 
         eventRepository.save(event);
-        log.info("New Event {} is saved", eventRequest.eventName());
+        log.info("New Event {} created by userId {} is saved", eventRequest.eventName(), eventRequest.organizerId());
 
         //
 
@@ -175,17 +172,30 @@ public class EventServiceImpl implements EventService{
     }
 
     // Kafka listener for BookingPlacedEvent
-    @KafkaListener(topics = "booking-placed-event")
+    @KafkaListener(topics = "booking-placed-event", groupId = "eventService")
     public void listenBookingEvent(BookingPlacedEvent bookingPlacedEvent) {
 
-        log.info("Received BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId());
+        log.info("Received BookingPlacedEvent from Kafka: {}", bookingPlacedEvent);
+
+        if (bookingPlacedEvent.getBookingId() == null || bookingPlacedEvent.getUserId() == null) {
+            log.warn("Invalid BookingPlacedEvent received: {}", bookingPlacedEvent);
+            return ;
+        }
 
         try {
-            // ADD EVENT CREATE LOGIC HERE
+            Event kafkaEvent = Event.builder()
+                    .eventName("Event for Booking " + bookingPlacedEvent.getBookingId())
+                    .eventType(bookingPlacedEvent.getPurpose())
+                    .organizerId(Long.parseLong(bookingPlacedEvent.getUserId()))
+                    .expectedAttendees(100)
+                    .build();
 
-            log.info("Event for Booking ID {} has been saved successfully.", bookingPlacedEvent.getBookingId());
+            eventRepository.save(kafkaEvent);
+            log.info("Created new event with ID: {}", bookingPlacedEvent.getBookingId());
+
+
         } catch (Exception e) {
-            log.error("An error occurred while processing BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId());
+            log.error("An error occurred while processing BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId(), e);
         }
     }
 

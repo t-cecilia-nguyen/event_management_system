@@ -9,7 +9,7 @@ import ca.gbc.eventservice.exception.UserRoleException;
 import java.util.List;
 
 public interface EventService {
-    EventResponse createEvent (EventRequest eventRequest, BookingPlacedEvent bookingPlacedEvent) throws UserRoleException, UserIdException;
+    EventResponse createEvent (EventRequest eventRequest) throws UserRoleException, UserIdException;
     List<EventResponse> getAllEvents();
     String updateEvent(String id, EventRequest eventRequest) throws UserIdException, UserRoleException;
     void deleteEvent(String id);
