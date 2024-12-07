@@ -69,19 +69,20 @@ public class ApprovalController {
 
     // Approve an approval
     @PutMapping("/approve")
+//    @PreAuthorize("hasRole('SCOPE_email')")
     public ResponseEntity<ApprovalResponse> approveApproval(
             @RequestBody ApprovalRequest approvalRequest,
             Authentication authentication) {
 
         log.info("Authenticator: {}",  authentication.getAuthorities());
-        // Check if the user has the "staff" role
-        boolean hasStaffRole = authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ROLE_staff"));
 
-        if (!hasStaffRole) {
-            log.warn("User {} does not have the required ROLE_staff authority", authentication.getName());
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
+//        boolean hasStaffRole = authentication.getAuthorities().stream()
+//                .anyMatch(authority -> authority.getAuthority().equals("ROLE_staff"));
+//
+//        if (!hasStaffRole) {
+//            log.warn("User {} does not have the required ROLE_staff authority", authentication.getName());
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//        }
 
         try {
             ApprovalResponse response = approvalService.approve(
@@ -117,7 +118,7 @@ public class ApprovalController {
 
 
     @PutMapping("/deny")
-//    @PreAuthorize("hasRole('ROLE_staff')")
+//    @PreAuthorize("hasRole('ROLE_email')")
     public ResponseEntity<ApprovalResponse> denyApproval(
 //            @PathVariable String id,
             @RequestBody ApprovalRequest approvalRequest) {

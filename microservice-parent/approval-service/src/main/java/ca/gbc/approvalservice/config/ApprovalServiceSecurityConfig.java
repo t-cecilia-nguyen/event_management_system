@@ -15,11 +15,10 @@ public class ApprovalServiceSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF if not required
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/debug-token").permitAll()  // Allow access to debug endpoint
-                        .requestMatchers("/api/approval/approve").hasRole("staff")
-                        .anyRequest().permitAll()
+                        .requestMatchers("/debug-token").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.decoder(keycloakJwtDecoder())) // Use KeycloakJwtDecoder
