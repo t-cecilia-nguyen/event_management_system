@@ -210,7 +210,7 @@ services:
     image: mongo-express
     container_name: mongo-express-a2
     ports:
-      - "8091:8081"
+      - "8070:8081"
     environment:
       - ME_CONFIG_MONGODB_SERVER=approval-mongo
       - ME_CONFIG_MONGODB_PORT=27020
