@@ -208,9 +208,9 @@ services:
 
   mongo-express:
     image: mongo-express
-    container_name: mongo-express
+    container_name: mongo-express-a2
     ports:
-      - "8091:8081"
+      - "8070:8081"
     environment:
       - ME_CONFIG_MONGODB_SERVER=approval-mongo
       - ME_CONFIG_MONGODB_PORT=27020
@@ -247,7 +247,7 @@ services:
     build:
       context: ./api-gateway
       dockerfile: ./Dockerfile
-    container_name: api-gateway
+    container_name: api-gateway-a2
     environment:
       SPRING_PROFILES_ACTIVE: docker
     networks:
@@ -258,7 +258,7 @@ services:
   ############
 
   keycloak:
-    container_name: keycloak
+    container_name: keycloak-a2
     hostname: keycloak
     image: quay.io/keycloak/keycloak:24.0.1
     command: [ "start-dev", "--import-realm" ]
@@ -285,7 +285,7 @@ services:
     image: postgres
     ports:
       - "5431:5432"
-    container_name: postgres-keycloak
+    container_name: postgres-keycloak-a2
     environment:
       - POSTGRES_DB=keycloak
       - POSTGRES_USER=admin
@@ -300,7 +300,49 @@ services:
   # KAFKA #
   #########
 
+  zookeeper:
+    container_name: zookeeper-a2
+    hostname: zookeeper
+    image: confluentinc/cp-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - spring
 
+  broker:
+    container_name: broker
+    image: confluentinc/cp-kafka:7.5.0
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT, PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092, PLAINTEXT_HOST://host.docker.internal:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+    networks:
+      - spring
+
+  kafka-ui:
+    container_name: kafka-ui-a2
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "8099:8099"
+    environment:
+      KAFKA_CLUSTER_NAME: local
+      KAFKA_CLUSTERS_BOOTSTRAPSERVERS: broker:29092
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      SERVER_PORT: 8099
+    depends_on:
+      - broker
+    networks:
+      - spring
 
   ####################
   # VOLUMES SECTION #

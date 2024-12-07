@@ -3,6 +3,7 @@ package ca.gbc.eventservice.service;
 import ca.gbc.eventservice.client.UserClient;
 import ca.gbc.eventservice.dto.EventRequest;
 import ca.gbc.eventservice.dto.EventResponse;
+import ca.gbc.eventservice.event.BookingPlacedEvent;
 import ca.gbc.eventservice.exception.UserIdException;
 import ca.gbc.eventservice.exception.UserRoleException;
 import ca.gbc.eventservice.model.Event;
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -60,12 +62,13 @@ public class EventServiceImpl implements EventService{
         }
     }
 
+
     @Override
     public EventResponse createEvent( EventRequest eventRequest) throws UserRoleException, UserIdException {
 
         //check organizerId
 
-        Long organizerId = eventRequest.organizerId();
+        Long organizerId = Long.valueOf(eventRequest.organizerId());
 
         //log.info("Checking if organizer ID exists: " + organizerId);
 
@@ -78,13 +81,15 @@ public class EventServiceImpl implements EventService{
         Event event = Event.builder()
                 .eventName(eventRequest.eventName())
                 .eventType(eventRequest.eventType())
+                //userId from booking parsed to organizerId
                 .organizerId(eventRequest.organizerId())
                 .expectedAttendees(eventRequest.expectedAttendees())
                 .build();
 
         eventRepository.save(event);
-        log.info("New Event {} is saved", eventRequest.eventName());
+        log.info("New Event {} created by userId {} is saved", eventRequest.eventName(), eventRequest.organizerId());
 
+        //
 
         return new EventResponse(
                 event.getId(),
@@ -166,5 +171,32 @@ public class EventServiceImpl implements EventService{
         return mapToEventResponse(event);
     }
 
+    // Kafka listener for BookingPlacedEvent
+    @KafkaListener(topics = "booking-placed-event", groupId = "eventService")
+    public void listenBookingEvent(BookingPlacedEvent bookingPlacedEvent) {
+
+        log.info("Received BookingPlacedEvent from Kafka: {}", bookingPlacedEvent);
+
+        if (bookingPlacedEvent.getBookingId() == null || bookingPlacedEvent.getUserId() == null) {
+            log.warn("Invalid BookingPlacedEvent received: {}", bookingPlacedEvent);
+            return ;
+        }
+
+        try {
+            Event kafkaEvent = Event.builder()
+                    .eventName("Event for Booking " + bookingPlacedEvent.getBookingId())
+                    .eventType(bookingPlacedEvent.getPurpose())
+                    .organizerId(Long.parseLong(bookingPlacedEvent.getUserId()))
+                    .expectedAttendees(100)
+                    .build();
+
+            eventRepository.save(kafkaEvent);
+            log.info("Created new event with ID: {}", bookingPlacedEvent.getBookingId());
+
+
+        } catch (Exception e) {
+            log.error("An error occurred while processing BookingPlacedEvent for Booking ID: {}", bookingPlacedEvent.getBookingId(), e);
+        }
+    }
 
 }

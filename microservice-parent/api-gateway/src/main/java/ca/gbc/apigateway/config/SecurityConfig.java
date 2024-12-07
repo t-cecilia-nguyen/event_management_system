@@ -7,28 +7,28 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true) // Enable @PreAuthorize
 public class SecurityConfig {
 
     private final String[] noauthResourceUris = {
             "/swagger-ui",
-            "/swagger-ui/*",
+//            "/swagger-ui/*",
             "/swagger-ui/**",
-            "/swagger-resources/**",
+            "/swagger-resource/**",
             "/v3/api-docs/**",
             "/api-docs/**",
-            "/aggregate/**",
-            "/api/approval"
+            "/aggregate/**"
+//            "/v3/api-docs/**", "/swagger-ui.html"
     };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+
         log.info("Initializing Security Filter Chain...");
 
         return httpSecurity

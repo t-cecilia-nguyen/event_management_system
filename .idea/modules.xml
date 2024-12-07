@@ -3,10 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" filepath="$PROJECT_DIR$/.idea/GBC_EventBooking-Group34.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/booking-service/microservice-parent.booking-service.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/event-service/microservice-parent.event-service.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/room-service/microservice-parent.room-service.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/microservice-parent.test.iml" filepath="$PROJECT_DIR$/.idea/modules/microservice-parent.test.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.test.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service/microservice-parent.user-service.test.iml" />
     </modules>
   </component>

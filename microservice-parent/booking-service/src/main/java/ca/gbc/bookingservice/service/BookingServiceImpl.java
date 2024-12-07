@@ -1,18 +1,22 @@
 package ca.gbc.bookingservice.service;
 
+
 import ca.gbc.bookingservice.client.RoomClient;
 import ca.gbc.bookingservice.dto.BookingRequest;
 import ca.gbc.bookingservice.dto.BookingResponse;
+import ca.gbc.bookingservice.event.BookingPlacedEvent;
 import ca.gbc.bookingservice.exception.ConflictException;
 import ca.gbc.bookingservice.exception.RoomNotAvailableException;
 import ca.gbc.bookingservice.model.Booking;
 import ca.gbc.bookingservice.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,10 +30,13 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final MongoTemplate mongoTemplate;
     private final RoomClient roomClient;
+    private final KafkaTemplate<String, BookingPlacedEvent> kafkaTemplate;
+
+//    @Value("${kafka.topic.booking-placed}")
+//    private String topic;
 
     @Override
     public BookingResponse createBooking(BookingRequest bookingRequest) {
-
 
         boolean isRoomAvailable = roomClient.checkRoomAvailability(bookingRequest.roomId());
         log.info("Room attempting to be booked has the availability status of: " + isRoomAvailable);
@@ -55,6 +62,27 @@ public class BookingServiceImpl implements BookingService {
 
             bookingRepository.save(booking);
             log.info("Booking with ID {} created", booking.getId());
+
+            // Create kafka booking placed event
+            BookingPlacedEvent bookingPlacedEvent =
+                    new BookingPlacedEvent(
+                            booking.getId(),
+                            booking.getUserId(),
+                            booking.getRoomId(),
+                            booking.getStartTime(),
+                            booking.getEndTime(),
+                            booking.getPurpose()
+                    );
+
+            // Log kafka start process
+            log.info("Start - Sending BookingPlacedEvent {} to Kafka topic booking-placed-event", bookingPlacedEvent);
+
+            // Publish booking event to kafka
+            kafkaTemplate.send("booking-placed-event", bookingPlacedEvent);
+
+            // Log kafka end process
+            log.info("Completed - Sent BookingPlacedEvent {} to Kafka topic booking-placed-event", bookingPlacedEvent);
+
             return mapToBookingResponse(booking);
         } else {
             throw new RoomNotAvailableException("Room with ID " + bookingRequest.roomId() + " is not available.");
