@@ -56,7 +56,7 @@ public class Routes {
         log.info("Initializing booking-service route with URL: {}", bookingServiceUrl);
 
         return route("booking_service")
-                .route(RequestPredicates.path("/bookings"), request -> {
+                .route(RequestPredicates.path("/bookings/**"), request -> {
                     log.info("Received request for booking-service: {}", request.uri());
                     return HandlerFunctions.http(bookingServiceUrl).handle(request);
                 })
